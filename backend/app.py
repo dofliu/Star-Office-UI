@@ -462,6 +462,7 @@ def get_agents():
 
     cleaned_agents = []
     keys_data = load_join_keys()
+    dirty = False  # only write to disk if something actually changed
 
     for a in agents:
         if a.get("isMain"):
@@ -484,6 +485,7 @@ def get_agents():
                             key_item["usedBy"] = None
                             key_item["usedByAgentId"] = None
                             key_item["usedAt"] = None
+                    dirty = True
                     continue
             except Exception:
                 pass
@@ -496,13 +498,15 @@ def get_agents():
                 age = (now - last_push_at).total_seconds()
                 if age > 300:  # 5分钟无推送自动离线
                     a["authStatus"] = "offline"
+                    dirty = True
             except Exception:
                 pass
 
         cleaned_agents.append(a)
 
-    save_agents_state(cleaned_agents)
-    save_join_keys(keys_data)
+    if dirty:
+        save_agents_state(cleaned_agents)
+        save_join_keys(keys_data)
 
     return jsonify(cleaned_agents)
 
