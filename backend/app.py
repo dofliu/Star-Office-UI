@@ -15,6 +15,18 @@ import threading
 from pathlib import Path
 from security_utils import is_production_mode, is_strong_secret, is_strong_drawer_pass
 from memo_utils import get_yesterday_date_str, sanitize_content, extract_memo_from_file
+from store_utils import (
+    load_agents_state as _store_load_agents_state,
+    save_agents_state as _store_save_agents_state,
+    load_asset_positions as _store_load_asset_positions,
+    save_asset_positions as _store_save_asset_positions,
+    load_asset_defaults as _store_load_asset_defaults,
+    save_asset_defaults as _store_save_asset_defaults,
+    load_runtime_config as _store_load_runtime_config,
+    save_runtime_config as _store_save_runtime_config,
+    load_join_keys as _store_load_join_keys,
+    save_join_keys as _store_save_join_keys,
+)
 
 try:
     from PIL import Image
@@ -227,82 +239,35 @@ DEFAULT_AGENTS = [
 
 
 def load_agents_state():
-    if os.path.exists(AGENTS_STATE_FILE):
-        try:
-            with open(AGENTS_STATE_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if isinstance(data, list):
-                    return data
-        except Exception:
-            pass
-    return list(DEFAULT_AGENTS)
+    return _store_load_agents_state(AGENTS_STATE_FILE, DEFAULT_AGENTS)
 
 
 def save_agents_state(agents):
-    with open(AGENTS_STATE_FILE, "w", encoding="utf-8") as f:
-        json.dump(agents, f, ensure_ascii=False, indent=2)
+    _store_save_agents_state(AGENTS_STATE_FILE, agents)
 
 
 def load_asset_positions():
-    if os.path.exists(ASSET_POSITIONS_FILE):
-        try:
-            with open(ASSET_POSITIONS_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if isinstance(data, dict):
-                    return data
-        except Exception:
-            pass
-    return {}
+    return _store_load_asset_positions(ASSET_POSITIONS_FILE)
 
 
 def save_asset_positions(data):
-    with open(ASSET_POSITIONS_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    _store_save_asset_positions(ASSET_POSITIONS_FILE, data)
 
 
 def load_asset_defaults():
-    if os.path.exists(ASSET_DEFAULTS_FILE):
-        try:
-            with open(ASSET_DEFAULTS_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if isinstance(data, dict):
-                    return data
-        except Exception:
-            pass
-    return {}
+    return _store_load_asset_defaults(ASSET_DEFAULTS_FILE)
 
 
 def save_asset_defaults(data):
-    with open(ASSET_DEFAULTS_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    _store_save_asset_defaults(ASSET_DEFAULTS_FILE, data)
 
 
 def load_runtime_config():
-    base = {
-        "gemini_api_key": os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or "",
-        "gemini_model": os.getenv("GEMINI_MODEL") or "nanobanana-pro"
-    }
-    if os.path.exists(RUNTIME_CONFIG_FILE):
-        try:
-            with open(RUNTIME_CONFIG_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if isinstance(data, dict):
-                    base.update({k: data.get(k, base.get(k)) for k in ["gemini_api_key", "gemini_model"]})
-        except Exception:
-            pass
-    return base
+    return _store_load_runtime_config(RUNTIME_CONFIG_FILE)
 
 
 def save_runtime_config(data):
-    cfg = load_runtime_config()
-    cfg.update(data or {})
-    with open(RUNTIME_CONFIG_FILE, "w", encoding="utf-8") as f:
-        json.dump(cfg, f, ensure_ascii=False, indent=2)
-    # Best-effort protect secrets on disk
-    try:
-        os.chmod(RUNTIME_CONFIG_FILE, 0o600)
-    except Exception:
-        pass
+    _store_save_runtime_config(RUNTIME_CONFIG_FILE, data)
 
 
 def _ensure_home_favorites_index():
@@ -359,20 +324,11 @@ def _maybe_apply_random_home_favorite():
 
 
 def load_join_keys():
-    if os.path.exists(JOIN_KEYS_FILE):
-        try:
-            with open(JOIN_KEYS_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if isinstance(data, dict) and isinstance(data.get("keys"), list):
-                    return data
-        except Exception:
-            pass
-    return {"keys": []}
+    return _store_load_join_keys(JOIN_KEYS_FILE)
 
 
 def save_join_keys(data):
-    with open(JOIN_KEYS_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    _store_save_join_keys(JOIN_KEYS_FILE, data)
 
 
 def _ensure_magick_or_ffmpeg_available():
