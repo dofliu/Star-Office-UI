@@ -243,10 +243,10 @@ npm run dev
 | 日付 | 概要 | 詳細 |
 |------|------|------|
 | 2026-03-06 | 🔌 デフォルトポート変更 — OpenClaw Browser Control との競合を避けるため、バックエンドの既定ポートを 18791 から 19000 に変更。スクリプト、デスクトップシェル、ドキュメントの既定値も同期更新 | [`docs/CHANGELOG_2026-03.md`](./docs/CHANGELOG_2026-03.md) |
-| 2026-03-01 | 🎉 **v2 リビルド公開** — 3 言語対応、資産管理システム、AI 画像生成による模様替え、アート資産全面刷新 | [`docs/FEATURES_NEW_2026-03-01.md`](./docs/FEATURES_NEW_2026-03-01.md) |
-| 2026-03-03 | 📋 オープンソース公開チェックリスト完了 | [`docs/OPEN_SOURCE_RELEASE_CHECKLIST.md`](./docs/OPEN_SOURCE_RELEASE_CHECKLIST.md) |
-| 2026-03-04 | 🔒 P0/P1 セキュリティ強化 — 弱パスワード拒否、バックエンド分割、stale ステータス自動 idle 復帰、スケルトンローディング | [`docs/UPDATE_REPORT_2026-03-04_P0_P1.md`](./docs/UPDATE_REPORT_2026-03-04_P0_P1.md) |
 | 2026-03-05 | 📱 安定性修正 — CDN キャッシュ修正、画像生成非同期化、モバイルサイドバー UX 改善、join key 有効期限・同時接続制御 | [`docs/UPDATE_REPORT_2026-03-05.md`](./docs/UPDATE_REPORT_2026-03-05.md) |
+| 2026-03-04 | 🔒 P0/P1 セキュリティ強化 — 弱パスワード拒否、バックエンド分割、stale ステータス自動 idle 復帰、スケルトンローディング | [`docs/UPDATE_REPORT_2026-03-04_P0_P1.md`](./docs/UPDATE_REPORT_2026-03-04_P0_P1.md) |
+| 2026-03-03 | 📋 オープンソース公開チェックリスト完了 | [`docs/OPEN_SOURCE_RELEASE_CHECKLIST.md`](./docs/OPEN_SOURCE_RELEASE_CHECKLIST.md) |
+| 2026-03-01 | 🎉 **v2 リビルド公開** — 3 言語対応、資産管理システム、AI 画像生成による模様替え、アート資産全面刷新 | [`docs/FEATURES_NEW_2026-03-01.md`](./docs/FEATURES_NEW_2026-03-01.md) |
 
 ---
 
