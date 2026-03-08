@@ -134,6 +134,43 @@ python3 gif_to_spritesheet.py
 - **快取策略**：HTML/API 回應 `no-cache`；靜態資源長快取 + 版本時間戳
 - **語言**：支援中/英/日三語，文字切換透過前端語言按鈕
 
+## 開發藍圖（目標）
+
+目前專案正朝四大目標推進，詳見 `docs/ROADMAP.md`：
+
+1. **即時代理人狀態儀表板** — 所有代理人的狀態、工作內容、進度一覽（P0）
+2. **代理人工作歷史紀錄** — 查看每個代理人的過往工作日誌與時間軸（P1）
+3. **像素畫面客製化** — 場景切換、解析度調整、人物角色選擇（P1）
+4. **OpenClaw 整合** — 透過 OpenClaw 管理、調度其他 AI 代理人（P2）
+
+## 關鍵開發文件
+
+| 文件 | 用途 |
+|------|------|
+| `CLAUDE.md` | AI 開發者規範（本文件） |
+| `docs/ROADMAP.md` | 工作藍圖與任務清單 |
+| `docs/DEVELOPMENT.md` | 技術架構與開發指南 |
+| `SKILL.md` | OpenClaw Skill 部署指引 |
+
+## AI CLI 橋接（`scripts/ai-office-bridge.py`）
+
+統一橋接腳本，支援 Claude Code / Gemini CLI / Codex CLI 三種 AI 工具即時推送狀態：
+
+```bash
+# 環境變數設定
+export STAR_OFFICE_URL="http://127.0.0.1:19000"
+export STAR_OFFICE_JOIN_KEY="ocj_starteam01"
+
+# Claude Code hooks 模式
+python3 scripts/ai-office-bridge.py claude-code hook < hook-event.json
+
+# Codex JSONL 串流模式
+codex exec --json "task" 2>&1 | python3 scripts/ai-office-bridge.py codex --stream
+
+# 手動推送狀態
+python3 scripts/ai-office-bridge.py claude-code writing "正在編輯程式碼"
+```
+
 ## 不要做的事
 
 - 不要修改 `assets/` 下的美術素材檔案（非商業授權）
