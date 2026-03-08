@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Office — AI Agent Dashboard</title>
+    <style>
+        @font-face {
+            font-family: 'ArkPixel';
+            src: url('/ui/fonts/ark-pixel-12px-proportional-zh_cn.ttf.woff2') format('woff2');
+            font-weight: normal; font-style: normal;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0f0e17;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            min-height: 100vh;
+            font-family: 'ArkPixel', 'Courier New', monospace;
+            color: #fffffe;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            image-rendering: pixelated;
+            border: 2px solid #2e2e4a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #game-container canvas { display: block; }
+
+        /* Settings Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 9999;
+            justify-content: center; align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: #1a1a2e; border: 2px solid #7f5af0;
+            border-radius: 12px; padding: 24px; width: 420px; max-width: 90vw;
+            color: #fffffe;
+        }
+        .modal h2 { font-size: 18px; margin-bottom: 16px; color: #7f5af0; }
+        .modal label { display: block; font-size: 13px; margin: 12px 0 4px; color: #94a1b2; }
+        .modal input[type="text"] {
+            width: 100%; padding: 8px 12px; font-size: 14px;
+            background: #16161a; border: 1px solid #2e2e4a; border-radius: 6px;
+            color: #fffffe; font-family: inherit;
+        }
+        .avatar-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+            margin: 8px 0;
+        }
+        .avatar-option {
+            width: 64px; height: 64px; border: 2px solid #2e2e4a;
+            border-radius: 8px; cursor: pointer; background: #16161a;
+            display: flex; align-items: center; justify-content: center;
+            transition: border-color 0.2s;
+            image-rendering: pixelated;
+        }
+        .avatar-option:hover { border-color: #7f5af0; }
+        .avatar-option.selected { border-color: #2cb67d; border-width: 3px; }
+        .avatar-option img { width: 48px; height: 48px; image-rendering: pixelated; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; justify-content: flex-end; }
+        .modal-buttons button {
+            padding: 8px 20px; border: none; border-radius: 6px;
+            font-family: inherit; font-size: 14px; cursor: pointer;
+        }
+        .btn-save { background: #7f5af0; color: white; }
+        .btn-save:hover { background: #6b4bd6; }
+        .btn-cancel { background: #2e2e4a; color: #94a1b2; }
+        .btn-cancel:hover { background: #3e3e5a; }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+
+    <!-- Agent Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <h2>⚙ Agent 設定</h2>
+            <label>顯示名稱 Display Name</label>
+            <input type="text" id="setting-display-name" placeholder="例：Agent K">
+            <label>頭像 Avatar</label>
+            <div class="avatar-grid" id="avatar-grid"></div>
+            <input type="text" id="setting-avatar-custom" placeholder="自訂頭像路徑（選填）">
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeSettings()">取消</button>
+                <button class="btn-save" onclick="saveSettings()">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <script src="/ui/office-scene.js"></script>
+    <script>
+    // --- Settings Modal Logic ---
+    let settingsAgentId = null;
+    let selectedAvatar = '';
+
+    function openSettings(agentId, currentDisplayName, currentAvatar) {
+        settingsAgentId = agentId;
+        document.getElementById('setting-display-name').value = currentDisplayName || '';
+        document.getElementById('setting-avatar-custom').value = '';
+        selectedAvatar = currentAvatar || '';
+
+        // Build avatar grid
+        const grid = document.getElementById('avatar-grid');
+        grid.innerHTML = '';
+        const avatars = [
+            'char_blue', 'char_green', 'char_red', 'char_purple',
+            'char_orange', 'char_cyan', 'char_pink', 'char_yellow'
+        ];
+        avatars.forEach(av => {
+            const div = document.createElement('div');
+            div.className = 'avatar-option' + (av === selectedAvatar ? ' selected' : '');
+            div.innerHTML = `<span style="font-size:28px">${avatarEmoji(av)}</span>`;
+            div.onclick = () => {
+                document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+                div.classList.add('selected');
+                selectedAvatar = av;
+            };
+            grid.appendChild(div);
+        });
+
+        document.getElementById('settings-modal').classList.add('active');
+    }
+
+    function closeSettings() {
+        document.getElementById('settings-modal').classList.remove('active');
+        settingsAgentId = null;
+    }
+
+    function avatarEmoji(key) {
+        const map = {
+            char_blue: '🔵', char_green: '🟢', char_red: '🔴', char_purple: '🟣',
+            char_orange: '🟠', char_cyan: '💠', char_pink: '🩷', char_yellow: '🟡'
+        };
+        return map[key] || '⬜';
+    }
+
+    async function saveSettings() {
+        if (!settingsAgentId) return;
+        const displayName = document.getElementById('setting-display-name').value.trim();
+        const customAvatar = document.getElementById('setting-avatar-custom').value.trim();
+        const avatar = customAvatar || selectedAvatar;
+
+        try {
+            const res = await fetch(`/agents/${settingsAgentId}/profile`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ display_name: displayName || null, avatar: avatar || null })
+            });
+            if (res.ok) {
+                closeSettings();
+                // Trigger immediate refresh in Phaser scene
+                if (window.starOfficeScene) window.starOfficeScene.fetchAgents();
+            }
+        } catch (e) {
+            console.error('Failed to save profile:', e);
+        }
+    }
+    </script>
+</body>
+</html>
