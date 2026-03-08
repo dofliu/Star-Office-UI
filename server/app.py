@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+"""Star Office API Server — Flask REST API on port 19200."""
+
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from flask import Flask, jsonify, request
+from core.office import Office
+from core.agent import VALID_STATES
+
+PORT = int(os.environ.get("STAR_OFFICE_PORT", 19200))
+STORE_PATH = os.environ.get("STAR_OFFICE_STORE", "office-state.json")
+
+app = Flask(__name__)
+
+
+def get_office():
+    return Office(STORE_PATH)
+
+
+# --- Health ---
+
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok", "port": PORT})
+
+
+# --- Agents ---
+
+@app.route("/agents", methods=["GET"])
+def list_agents():
+    office = get_office()
+    agents = office.list_agents()
+    return jsonify({"agents": [a.to_dict() for a in agents]})
+
+
+@app.route("/agents/<agent_id>", methods=["GET"])
+def get_agent(agent_id):
+    office = get_office()
+    try:
+        agent = office.get_agent(agent_id)
+        agent.check_ttl()
+        return jsonify(agent.to_dict())
+    except KeyError:
+        return jsonify({"error": f"Agent '{agent_id}' not found"}), 404
+
+
+@app.route("/agents", methods=["POST"])
+def add_agent():
+    data = request.get_json(silent=True) or {}
+    agent_id = data.get("id")
+    name = data.get("name")
+    ttl = data.get("ttl", 300)
+
+    if not agent_id or not name:
+        return jsonify({"error": "Missing 'id' and 'name'"}), 400
+
+    office = get_office()
+    try:
+        agent = office.add_agent(agent_id, name, ttl)
+        return jsonify(agent.to_dict()), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 409
+
+
+@app.route("/agents/<agent_id>", methods=["DELETE"])
+def remove_agent(agent_id):
+    office = get_office()
+    try:
+        office.remove_agent(agent_id)
+        return jsonify({"removed": agent_id})
+    except KeyError:
+        return jsonify({"error": f"Agent '{agent_id}' not found"}), 404
+
+
+# --- State ---
+
+@app.route("/agents/<agent_id>/state", methods=["POST"])
+def set_state(agent_id):
+    data = request.get_json(silent=True) or {}
+    state = data.get("state")
+    message = data.get("message", "")
+
+    if not state:
+        return jsonify({"error": "Missing 'state'"}), 400
+
+    office = get_office()
+    try:
+        agent = office.set_state(agent_id, state, message)
+        return jsonify(agent.to_dict())
+    except KeyError:
+        return jsonify({"error": f"Agent '{agent_id}' not found"}), 404
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+
+# --- Convenience: overview ---
+
+@app.route("/")
+def index():
+    office = get_office()
+    agents = office.list_agents()
+    return jsonify({
+        "service": "Star Office",
+        "port": PORT,
+        "agent_count": len(agents),
+        "agents": [
+            {"id": a.id, "name": a.name, "state": a.state, "message": a.message}
+            for a in agents
+        ],
+        "valid_states": sorted(VALID_STATES),
+    })
+
+
+if __name__ == "__main__":
+    print(f"Star Office API starting on port {PORT}")
+    app.run(host="0.0.0.0", port=PORT, debug=True)
