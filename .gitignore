@@ -42,6 +42,7 @@ join-keys.json
 data/
 logs/
 office-state.json
+scene-config.json
 frontend-vue/node_modules/
 # frontend-vue/dist/ — included in git for easy deployment
 .claw-office-bridge/

@@ -103,6 +103,114 @@ class HistoryLogger:
                 agents.append(fname[:-6])  # strip .jsonl
         return sorted(agents)
 
+    def generate_daily_summary(self, agent_id: str, date_str: str = "") -> dict:
+        """Generate a daily work summary for a specific date (YYYY-MM-DD).
+        If date_str is empty, uses today's date."""
+        if not date_str:
+            date_str = datetime.now().strftime("%Y-%m-%d")
+
+        try:
+            target_date = datetime.strptime(date_str, "%Y-%m-%d")
+        except ValueError:
+            return {"error": f"Invalid date format: {date_str}. Use YYYY-MM-DD."}
+
+        start_ts = target_date.replace(hour=0, minute=0, second=0).timestamp()
+        end_ts = target_date.replace(hour=23, minute=59, second=59).timestamp()
+
+        path = self._log_path(agent_id)
+        if not os.path.exists(path):
+            return {
+                "agent_id": agent_id,
+                "date": date_str,
+                "total_entries": 0,
+                "work_time_minutes": 0,
+                "state_distribution": {},
+                "tasks": [],
+                "first_activity": "",
+                "last_activity": "",
+            }
+
+        entries = []
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                    ts = entry.get("timestamp", 0)
+                    if start_ts <= ts <= end_ts:
+                        entries.append(entry)
+                except json.JSONDecodeError:
+                    continue
+
+        if not entries:
+            return {
+                "agent_id": agent_id,
+                "date": date_str,
+                "total_entries": 0,
+                "work_time_minutes": 0,
+                "state_distribution": {},
+                "tasks": [],
+                "first_activity": "",
+                "last_activity": "",
+            }
+
+        entries.sort(key=lambda e: e["timestamp"])
+
+        # Calculate work time (time spent in work states)
+        work_states = {"writing", "researching", "executing", "syncing"}
+        work_minutes = 0
+        for i in range(len(entries) - 1):
+            if entries[i].get("state") in work_states:
+                delta = entries[i + 1]["timestamp"] - entries[i]["timestamp"]
+                work_minutes += min(delta, 3600) / 60  # cap at 1h per segment
+
+        # State distribution
+        state_counts: dict[str, int] = {}
+        for e in entries:
+            st = e.get("state", "unknown")
+            state_counts[st] = state_counts.get(st, 0) + 1
+
+        # Unique tasks (messages)
+        tasks = []
+        for e in entries:
+            msg = e.get("message", "")
+            if msg and msg not in tasks:
+                tasks.append(msg)
+
+        return {
+            "agent_id": agent_id,
+            "date": date_str,
+            "total_entries": len(entries),
+            "work_time_minutes": round(work_minutes, 1),
+            "state_distribution": state_counts,
+            "tasks": tasks[:30],
+            "first_activity": entries[0].get("datetime", ""),
+            "last_activity": entries[-1].get("datetime", ""),
+        }
+
+    def generate_all_daily_summaries(self, date_str: str = "") -> list[dict]:
+        """Generate daily summaries for all agents."""
+        agents = self.get_all_agents()
+        summaries = []
+        for agent_id in agents:
+            summary = self.generate_daily_summary(agent_id, date_str)
+            if summary.get("total_entries", 0) > 0:
+                summaries.append(summary)
+        return summaries
+
+    def auto_cleanup(self, max_age_days: int = 30) -> dict:
+        """Run cleanup and return detailed results."""
+        removed = self.cleanup(max_age_days)
+        remaining_agents = self.get_all_agents()
+        return {
+            "removed_entries": removed,
+            "max_age_days": max_age_days,
+            "remaining_agents": remaining_agents,
+            "remaining_agent_count": len(remaining_agents),
+        }
+
     def cleanup(self, max_age_days: int = 30) -> int:
         """Remove log entries older than max_age_days. Returns count of removed entries."""
         cutoff = time.time() - (max_age_days * 86400)
