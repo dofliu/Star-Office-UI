@@ -1,35 +1,42 @@
 #!/bin/bash
-# Claw Office UI - One-click AI Hook Setup
+# Star Office UI V2 - One-click AI Hook Setup
 #
-# This script configures Claude Code, Codex CLI, and Gemini CLI
-# to automatically push status to the Claw Office UI dashboard.
+# 自動設定 Claude Code / Gemini CLI 的 hooks，
+# 讓 AI 工具的工作狀態即時顯示在 Star Office UI 儀表板。
 #
-# Usage:
-#   bash scripts/setup-hooks.sh [--url http://host:port]
+# 用法：
+#   bash scripts/setup-hooks.sh
+#   bash scripts/setup-hooks.sh --url http://your-server:19200
 #
-# What it does:
-#   1. Detects which AI CLI tools are installed
-#   2. Configures hooks/settings for each tool
-#   3. Registers agents with the office server
-#   4. Shows verification commands
+# 做了什麼：
+#   1. 偵測已安裝的 AI CLI 工具
+#   2. 設定各工具的 hooks（自動推送狀態）
+#   3. 註冊預設 agent
+#   4. 顯示驗證指令
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 BRIDGE_SCRIPT="$SCRIPT_DIR/ai-office-bridge-v2.py"
-OFFICE_URL="${1:-${STAR_OFFICE_URL:-http://127.0.0.1:19000}}"
 
-# Remove --url flag if present
-if [ "$1" = "--url" ]; then
-    OFFICE_URL="${2:-http://127.0.0.1:19000}"
+# 解析參數
+OFFICE_URL="${STAR_OFFICE_URL:-http://127.0.0.1:19200}"
+if [ "$1" = "--url" ] && [ -n "$2" ]; then
+    OFFICE_URL="$2"
+elif [ -n "$1" ] && [ "$1" != "--url" ]; then
+    OFFICE_URL="$1"
 fi
 
-echo "=== Claw Office UI - Hook Setup ==="
-echo "Office URL: $OFFICE_URL"
-echo "Bridge Script: $BRIDGE_SCRIPT"
+echo "╔══════════════════════════════════════════╗"
+echo "║   ⭐ Star Office UI — Hook Setup        ║"
+echo "╚══════════════════════════════════════════╝"
+echo ""
+echo "  Server URL:    $OFFICE_URL"
+echo "  Bridge Script: $BRIDGE_SCRIPT"
 echo ""
 
-# Check bridge script exists
+# 檢查橋接腳本
 if [ ! -f "$BRIDGE_SCRIPT" ]; then
     echo "ERROR: Bridge script not found at $BRIDGE_SCRIPT"
     exit 1
@@ -37,27 +44,26 @@ fi
 
 # --- Claude Code ---
 setup_claude_code() {
-    echo "--- Setting up Claude Code ---"
+    echo "── Claude Code ──────────────────────────"
+
+    if ! command -v claude &> /dev/null; then
+        echo "  ⚠ Claude Code CLI not found, skipping."
+        echo "  (Install: npm install -g @anthropic-ai/claude-code)"
+        return
+    fi
+
+    echo "  ✓ Claude Code detected"
 
     CLAUDE_SETTINGS="$HOME/.claude/settings.json"
     mkdir -p "$HOME/.claude"
 
-    # Check if Claude Code is installed
-    if ! command -v claude &> /dev/null; then
-        echo "  Claude Code CLI not found, skipping."
-        return
-    fi
-
-    # Create or update settings with hooks
-    HOOK_CMD="STAR_OFFICE_URL=$OFFICE_URL python3 $BRIDGE_SCRIPT claude-code hook"
+    HOOK_CMD="STAR_OFFICE_URL=$OFFICE_URL python3 $BRIDGE_SCRIPT --hook claude-code"
 
     if [ -f "$CLAUDE_SETTINGS" ]; then
-        # Backup
         cp "$CLAUDE_SETTINGS" "$CLAUDE_SETTINGS.bak"
-        echo "  Backed up existing settings to $CLAUDE_SETTINGS.bak"
+        echo "  Backed up settings → $CLAUDE_SETTINGS.bak"
     fi
 
-    # Use Python to safely merge JSON
     python3 -c "
 import json, os
 
@@ -72,51 +78,42 @@ if os.path.exists(settings_file):
 if 'hooks' not in settings:
     settings['hooks'] = {}
 
-settings['hooks']['PostToolUse'] = [{
+# PreToolUse hook — 在每次工具呼叫前推送狀態
+settings['hooks']['PreToolUse'] = [{
     'type': 'command',
     'command': hook_cmd
 }]
 
+# Stop hook — AI 完成任務後回 idle
+settings['hooks']['Stop'] = [{
+    'type': 'command',
+    'command': 'echo {\"type\":\"Stop\"} | ' + hook_cmd
+}]
+
 with open(settings_file, 'w') as f:
-    json.dump(settings, f, indent=2)
+    json.dump(settings, f, indent=2, ensure_ascii=False)
 
-print('  Claude Code hooks configured successfully.')
+print('  ✓ Claude Code hooks configured')
+print(f'    → {settings_file}')
 "
-}
-
-# --- Codex CLI ---
-setup_codex() {
-    echo "--- Setting up Codex CLI ---"
-
-    if ! command -v codex &> /dev/null; then
-        echo "  Codex CLI not found, skipping."
-        return
-    fi
-
-    echo "  Codex CLI detected."
-    echo "  To use with Claw Office, pipe output through bridge:"
-    echo ""
-    echo "    export STAR_OFFICE_URL=$OFFICE_URL"
-    echo "    codex exec --json 'your task' 2>&1 | python3 $BRIDGE_SCRIPT codex --stream"
-    echo ""
-    echo "  Or add this alias to your shell config:"
-    echo "    alias codex-office='codex exec --json 2>&1 | STAR_OFFICE_URL=$OFFICE_URL python3 $BRIDGE_SCRIPT codex --stream'"
 }
 
 # --- Gemini CLI ---
 setup_gemini() {
-    echo "--- Setting up Gemini CLI ---"
+    echo ""
+    echo "── Gemini CLI ───────────────────────────"
 
     if ! command -v gemini &> /dev/null; then
-        echo "  Gemini CLI not found, skipping."
+        echo "  ⚠ Gemini CLI not found, skipping."
         return
     fi
 
-    echo "  Gemini CLI detected."
+    echo "  ✓ Gemini CLI detected"
+
     GEMINI_SETTINGS="$HOME/.gemini/settings.json"
     mkdir -p "$HOME/.gemini"
 
-    HOOK_CMD="STAR_OFFICE_URL=$OFFICE_URL python3 $BRIDGE_SCRIPT gemini hook"
+    HOOK_CMD="STAR_OFFICE_URL=$OFFICE_URL python3 $BRIDGE_SCRIPT --hook gemini"
 
     python3 -c "
 import json, os
@@ -140,38 +137,41 @@ settings['hooks']['post_tool_use'] = [{
 with open(settings_file, 'w') as f:
     json.dump(settings, f, indent=2)
 
-print('  Gemini CLI hooks configured successfully.')
+print('  ✓ Gemini CLI hooks configured')
+print(f'    → {settings_file}')
 "
 }
 
-# --- Register Agents ---
+# --- 註冊預設 Agent ---
 register_agents() {
     echo ""
-    echo "--- Registering Agents ---"
+    echo "── Registering Agents ─────────────────"
     export STAR_OFFICE_URL="$OFFICE_URL"
 
-    # Try to register default agents
-    for tool in claude-code codex gemini; do
-        python3 "$BRIDGE_SCRIPT" "$tool" idle "Setup complete" 2>/dev/null || true
-    done
-    echo "  Agent registration complete."
+    # 嘗試註冊預設 agent
+    python3 "$BRIDGE_SCRIPT" --register claude "Claude Code" char_purple 2>/dev/null && \
+        echo "  ✓ Claude Code agent registered" || \
+        echo "  ⚠ Could not register (server may not be running)"
 }
 
-# Run setup
+# --- 執行 ---
 setup_claude_code
-echo ""
-setup_codex
-echo ""
 setup_gemini
 register_agents
 
 echo ""
-echo "=== Setup Complete ==="
+echo "══════════════════════════════════════════"
 echo ""
-echo "Dashboard: $OFFICE_URL"
+echo "  ✓ Setup complete!"
 echo ""
-echo "To start the office server:"
-echo "  cd $(dirname $SCRIPT_DIR) && python3 backend/app_v2.py"
+echo "  Dashboard:  $OFFICE_URL"
+echo "  Server:     python3 $PROJECT_DIR/server/app.py"
 echo ""
-echo "Environment variables (add to your .bashrc/.zshrc):"
-echo "  export STAR_OFFICE_URL=$OFFICE_URL"
+echo "  Manual test commands:"
+echo "    python3 $BRIDGE_SCRIPT --status"
+echo "    python3 $BRIDGE_SCRIPT claude writing '正在寫程式'"
+echo "    python3 $BRIDGE_SCRIPT claude idle"
+echo ""
+echo "  Add to your shell config (.bashrc / .zshrc):"
+echo "    export STAR_OFFICE_URL=$OFFICE_URL"
+echo ""
