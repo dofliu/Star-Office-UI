@@ -369,7 +369,29 @@ function create() {
     sofa.anims.play('sofa_busy', true);
   }
 
-  // === 牌匾（来自 LAYOUT）===
+  // === 場景名稱顯示 ===
+  const sceneName = getCurrentScene().name;
+  const sceneDesc = getCurrentScene().description;
+  
+  const sceneText = game.add.text(640, 30, sceneName, {
+    fontFamily: 'ArkPixel, monospace',
+    fontSize: '24px',
+    fill: '#ffffff',
+    stroke: '#000000',
+    strokeThickness: 4,
+    align: 'center'
+  }).setOrigin(0.5);
+  sceneText.setDepth(3000);
+  
+  const sceneDescText = game.add.text(640, 60, sceneDesc, {
+    fontFamily: 'ArkPixel, monospace',
+    fontSize: '16px',
+    fill: '#cccccc',
+    stroke: '#000000',
+    strokeThickness: 3,
+    align: 'center'
+  }).setOrigin(0.5);
+  sceneDescText.setDepth(3000);
   const plaqueX = LAYOUT.plaque.x;
   const plaqueY = LAYOUT.plaque.y;
   const plaqueBg = game.add.rectangle(plaqueX, plaqueY, LAYOUT.plaque.width, LAYOUT.plaque.height, 0x5d4037);
@@ -941,11 +963,30 @@ function fetchAgents() {
     });
 }
 
-function getAreaPosition(area, slotIndex) {
-  const positions = AREA_POSITIONS[area] || AREA_POSITIONS.breakroom;
-  const idx = (slotIndex || 0) % positions.length;
-  return positions[idx];
+// 場景切換函數（在 HTML 按鈕中調用）
+function doSwitchScene(sceneId) {
+  if (!window.game || !window.game.scene) {
+    console.error('遊戲未初始化');
+    return;
+  }
+  
+  // 調用全局切換函數
+  window.switchToScene(sceneId);
 }
+
+// 全局場景切換函數
+window.switchToScene = function(sceneId) {
+  if (!window.game || !window.game.scene) {
+    console.error('遊戲未初始化');
+    return;
+  }
+  
+  if (switchScene(sceneId)) {
+    console.log('切換到場景:', sceneId);
+    // 重新載入遊戲場景
+    window.game.scene.restart();
+  }
+};
 
 function renderAgent(agent) {
   const agentId = agent.agentId;

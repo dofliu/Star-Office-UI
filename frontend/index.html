@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Star 的像素办公室</title>
+    <title>DofLab 劉瑞弘老師辦公室</title>
     <style>
         @font-face {
             font-family: 'ArkPixel';
@@ -16,7 +16,7 @@
             background: #1a1a2e;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: flex-DofLabt;
             align-items: center;
             min-height: 100vh;
             font-family: 'ArkPixel', 'Courier New', monospace;
@@ -40,7 +40,7 @@
             gap: 20px;
             width: 1280px;
             max-width: none;
-            justify-content: flex-start;
+            justify-content: flex-DofLabt;
             margin-top: 20px;
         }
         #game-container {
@@ -60,7 +60,7 @@
             image-rendering: pixelated;
             /* 再兜底一次：即使外层高度变化，也不要拉伸变形 */
             object-fit: contain;
-            /* 边框改为直接贴合画布内部，避免“框比地图大” */
+            /* 边框改为直接贴合画布内部，避免"框比地图大" */
             box-shadow: inset 0 0 0 4px #64477d;
             position: relative;
             z-index: 10;
@@ -219,7 +219,7 @@
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 8px;
-            align-content: start;
+            align-content: DofLabt;
             padding-top: 4px;
             padding-left: 10px;
             padding-right: 10px;
@@ -461,7 +461,7 @@
             letter-spacing:.2px;
             text-shadow:none;
             display:inline-flex;
-            align-items:flex-start;
+            align-items:flex-DofLabt;
             justify-content:center;
             transition: padding-top .08s ease, filter .12s ease;
             box-shadow:none;
@@ -643,7 +643,7 @@
             background: #4a4f5f;
             border-color: #e94560;
         }
-        /* Star 状态四按钮（不含装修）使用像素精灵皮肤 */
+        /* DofLab 状态四按钮（不含装修）使用像素精灵皮肤 */
         #control-bar #btn-state-idle,
         #control-bar #btn-state-writing,
         #control-bar #btn-state-syncing,
@@ -1050,7 +1050,7 @@
             }
 
             .guest-agent-item {
-                align-items: flex-start;
+                align-items: flex-DofLabt;
                 gap: 10px;
                 flex-direction: column;
             }
@@ -1133,18 +1133,18 @@
 <body>
     <!-- 加载遮罩 -->
     <div id="loading-overlay">
-        <div id="loading-text">Loading Star’s pixel office...</div>
+        <div id="loading-text">正在載入 DofLab 辦公室...</div>
         <div id="loading-progress-container">
             <div id="loading-progress-bar"></div>
         </div>
     </div>
-    
+
     <div id="main-stage">
         <div id="game-container">
             <div id="game-skeleton"><div class="hint">正在进入像素办公室…</div></div>
             <div id="status-text">加载中...</div>
         </div>
-    
+
     <!-- 底部面板容器 -->
     <div id="bottom-panels">
         <!-- Memo 面板 -->
@@ -1157,11 +1157,17 @@
             </div>
             <div class="memo-decoration">─ ─ ─ ─ ─</div>
         </div>
-        
+
         <!-- 状态控制栏 -->
         <div id="control-bar">
-            <div id="control-bar-title">Star 状态</div>
+            <div id="control-bar-title">DofLab 状态</div>
             <div id="control-buttons">
+                <!-- 场景切换 -->
+                <!-- 场景切换 -->
+                <button onclick="doSwitchScene('mainOffice')">主办公室</button>
+                <button onclick="doSwitchScene('creativeStudio')">创意工作室</button>
+                <button onclick="doSwitchScene('meetingRoom')">会议室</button>
+                <!-- 状态切换 -->
                 <button id="btn-state-idle" onclick="setState('idle','待命')">待命</button>
                 <button id="btn-state-writing" onclick="setState('writing','工作中')">工作</button>
                 <button id="btn-state-syncing" onclick="setState('syncing','同步中')">同步</button>
@@ -1179,7 +1185,7 @@
             </div>
         </div>
     </div>
-    
+
     <div id="asset-highlight"></div>
     <div id="room-loading-overlay" aria-live="polite" aria-busy="true">
         <div class="room-loading-inner">
@@ -1218,7 +1224,7 @@
                     <div id="asset-broker-panel">
                         <div class="asset-sub" style="margin-bottom:6px;">写你的风格主题（严格保持原始房间结构，只改变视觉风格）</div>
                         <textarea id="asset-broker-prompt" placeholder="例如：像素风赛博东京夜景，霓虹灯、雨夜地面反光、蓝紫主色"></textarea>
-                        <div class="asset-toolbar" style="margin-top:6px; gap:8px; align-items:center; justify-content:flex-start;">
+                        <div class="asset-toolbar" style="margin-top:6px; gap:8px; align-items:center; justify-content:flex-DofLabt;">
                             <span id="speed-mode-label" class="asset-sub" style="min-width:62px;">生成模式</span>
                             <button id="speed-fast-btn" type="button" onclick="setSpeedMode('fast')" style="background:#22c55e;color:#052e16;border-color:#16a34a;">🍌2</button>
                             <button id="speed-quality-btn" type="button" onclick="setSpeedMode('quality')" style="background:#334155;color:#e5e7eb;border-color:#475569;">🍌Pro</button>
@@ -1255,7 +1261,7 @@
 
                 <div id="asset-manual-panel" style="display:flex; flex-direction:column; flex:1; min-height:0;">
                     <div class="asset-toolbar">
-                        <input id="asset-search" placeholder="搜索资产名（如 desk / sofa / star）" oninput="renderAssetDrawerList()" />
+                        <input id="asset-search" placeholder="搜索资产名（如 desk / sofa / DofLab）" oninput="renderAssetDrawerList()" />
                     </div>
                     <div id="asset-list"></div>
                     <div id="asset-upload-panel">
@@ -1293,7 +1299,7 @@
         let uiLang = localStorage.getItem('uiLang') || 'en';
         const I18N = {
             zh: {
-                controlTitle: 'Star 状态',
+                controlTitle: 'DofLab 状态',
                 btnIdle: '待命', btnWork: '工作', btnSync: '同步', btnError: '报警', btnDecor: '装修房间',
                 drawerTitle: '装修房间 · 资产侧边栏', drawerClose: '关闭',
                 authTitle: '请输入装修验证码', authPlaceholder: '输入验证码', authVerify: '验证', authDefaultPassHint: '默认密码：1234（可随时让我帮你改，建议改成强密码）',
@@ -1302,7 +1308,7 @@
                 assetHide: '隐藏', assetShow: '显示',
                 resetToDefault: '重置为默认资产', restorePrevAsset: '用上一版',
                 btnMove: '📦 搬新家', btnHome: '🐚 回老家', btnHomeLast: '↩️ 回上一个家', btnHomeFavorite: '⭐ 收藏这个家', btnBroker: '🤝 找中介', btnDIY: '🪚 自己装', btnBrokerGo: '听中介的',
-                homeFavTitle: '🏠 收藏的家', homeFavEmpty: '还没有收藏，先点“⭐ 收藏这个家”', homeFavApply: '替换到当前地图', homeFavDelete: '删除', homeFavSaved: '✅ 已收藏当前地图', homeFavApplied: '✅ 已替换为收藏地图', homeFavDeleted: '🗑️ 已删除收藏',
+                homeFavTitle: '🏠 收藏的家', homeFavEmpty: '还没有收藏，先点"⭐ 收藏这个家"', homeFavApply: '替换到当前地图', homeFavDelete: '删除', homeFavSaved: '✅ 已收藏当前地图', homeFavApplied: '✅ 已替换为收藏地图', homeFavDeleted: '🗑️ 已删除收藏',
                 brokerHint: '你会给龙虾推荐什么样的房子',
                 brokerPromptPh: '例如：故宫主题、莫奈风格、地牢主题、兵马俑主题……',
                 brokerNeedPrompt: '请先输入中介方案描述',
@@ -1312,16 +1318,16 @@
                 brokerMissingKey: '❌ 生图失败：缺少 GEMINI API Key，请在下方填写并保存后重试',
                 geminiPanelTitle: '🔐 API 设置（可折叠）', geminiHint: '可选：填写你的生图 API Key（留空不影响基础功能）', geminiApiDoc: '📘 如何申请 Google API Key', geminiInputPh: '粘贴 GEMINI_API_KEY（不会回显）', geminiSaveKey: '保存 Key', geminiMaskNoKey: '当前状态：未配置 Key', geminiMaskHasKey: '当前已配置：',
                 speedModeLabel: '生成模式', speedFast: '🍌2', speedQuality: '🍌Pro',
-                searchPlaceholder: '搜索资产名（如 desk / sofa / star）', loaded: '已加载', allAssets: '全部资产',
+                searchPlaceholder: '搜索资产名（如 desk / sofa / DofLab）', loaded: '已加载', allAssets: '全部资产',
                 chooseImage: '上传素材', confirmUpload: '确认刷新', resetToDefault: '重置默认', restorePrevAsset: '恢复上版', uploadPending: '待上传', uploadTarget: '目标',
                 assetHintNotInScene: '当前场景未检测到此对象，仍可替换文件（刷新后生效）',
                 assetHintDefault: '通用素材：建议保持原图尺寸、透明通道与视觉重心一致，避免错位或失真',
                 showCoords: '显示坐标', hideCoords: '隐藏坐标', moveView: '移动视野', lockView: '锁定视野',
                 memoTitle: '昨 日 小 记', guestTitle: '访 客 列 表', officeTitle: '海辛小龙虾的办公室',
-                loadingOffice: '正在加载 Star 的像素办公室...'
+                loadingOffice: '正在加载 DofLab 劉瑞弘老師辦公室...'
             },
             en: {
-                controlTitle: 'Star Status',
+                controlTitle: 'DofLab Status',
                 btnIdle: 'Idle', btnWork: 'Work', btnSync: 'Sync', btnError: 'Alert', btnDecor: 'Decorate Room',
                 drawerTitle: 'Decorate Room · Asset Sidebar', drawerClose: 'Close',
                 authTitle: 'Enter Decor Passcode', authPlaceholder: 'Enter passcode', authVerify: 'Verify', authDefaultPassHint: 'Default passcode: 1234 (ask me anytime to change it; stronger passcode recommended)',
@@ -1330,7 +1336,7 @@
                 assetHide: 'Hide', assetShow: 'Show',
                 resetToDefault: 'Reset to Default', restorePrevAsset: 'Use Previous',
                 btnMove: '📦 New Home', btnHome: '🐚 Go Home', btnHomeLast: '↩️ Last One', btnHomeFavorite: '⭐ Save This Home', btnBroker: '🤝 Broker', btnDIY: '🪚 DIY', btnBrokerGo: 'Follow Broker',
-                homeFavTitle: '🏠 Saved Homes', homeFavEmpty: 'No saved homes yet. Tap “⭐ Save This Home” first.', homeFavApply: 'Apply to Current Map', homeFavDelete: 'Delete', homeFavSaved: '✅ Current map saved', homeFavApplied: '✅ Applied saved home', homeFavDeleted: '🗑️ Saved home deleted',
+                homeFavTitle: '🏠 Saved Homes', homeFavEmpty: 'No saved homes yet. Tap "⭐ Save This Home" first.', homeFavApply: 'Apply to Current Map', homeFavDelete: 'Delete', homeFavSaved: '✅ Current map saved', homeFavApplied: '✅ Applied saved home', homeFavDeleted: '🗑️ Saved home deleted',
                 brokerHint: 'What kind of house would you recommend for Lobster?',
                 brokerPromptPh: 'e.g. Forbidden City theme, Monet style, dungeon theme, Terracotta Warriors theme...',
                 brokerNeedPrompt: 'Please enter broker style prompt first',
@@ -1340,16 +1346,16 @@
                 brokerMissingKey: '❌ Generation failed: missing GEMINI API key. Fill it below and retry.',
                 geminiPanelTitle: '🔐 API Settings (collapsible)', geminiHint: 'Optional: set your image API key (base features work without it)', geminiApiDoc: '📘 How to get a Google API Key', geminiInputPh: 'Paste GEMINI_API_KEY (input hidden)', geminiSaveKey: 'Save Key', geminiMaskNoKey: 'Current: no key configured', geminiMaskHasKey: 'Configured key:',
                 speedModeLabel: 'Render Mode', speedFast: '🍌2', speedQuality: '🍌Pro',
-                searchPlaceholder: 'Search assets (desk / sofa / star)', loaded: 'Loaded', allAssets: 'All Assets',
+                searchPlaceholder: 'Search assets (desk / sofa / DofLab)', loaded: 'Loaded', allAssets: 'All Assets',
                 chooseImage: 'Upload Asset', confirmUpload: 'Apply Refresh', resetToDefault: 'Reset Default', restorePrevAsset: 'Restore Prev', uploadPending: 'Pending Upload', uploadTarget: 'Target',
                 assetHintNotInScene: 'This object is not detected in current scene; you can still replace file (effective after refresh)',
                 assetHintDefault: 'Generic asset: keep source size, alpha channel, and visual anchor to avoid drift/distortion',
                 showCoords: 'Show Coords', hideCoords: 'Hide Coords', moveView: 'Pan View', lockView: 'Lock View',
                 memoTitle: 'YESTERDAY NOTES', guestTitle: 'VISITOR LIST', officeTitle: 'Haixin Lobster Office',
-                loadingOffice: 'Loading Star’s pixel office...'
+                loadingOffice: 'Loading DofLab's pixel office...'
             },
             ja: {
-                controlTitle: 'Star ステータス',
+                controlTitle: 'DofLab ステータス',
                 btnIdle: '待機', btnWork: '作業', btnSync: '同期', btnError: '警報', btnDecor: '部屋を編集',
                 drawerTitle: '部屋編集・アセットサイドバー', drawerClose: '閉じる',
                 authTitle: '編集パスコードを入力', authPlaceholder: 'パスコード入力', authVerify: '認証', authDefaultPassHint: '初期パスコード：1234（いつでも変更を相談可。強固なパス推奨）',
@@ -1368,13 +1374,13 @@
                 brokerMissingKey: '❌ 生成失敗：GEMINI APIキーが未設定です。下で入力して保存してください。',
                 geminiPanelTitle: '🔐 API設定（折りたたみ）', geminiHint: '任意：画像生成APIキーを設定（未設定でも基本機能は利用可）', geminiApiDoc: '📘 Google API Keyの取得方法', geminiInputPh: 'GEMINI_API_KEY を貼り付け（入力は非表示）', geminiSaveKey: 'Keyを保存', geminiMaskNoKey: '現在：キー未設定', geminiMaskHasKey: '設定済みキー：',
                 speedModeLabel: '生成モード', speedFast: '🍌2', speedQuality: '🍌Pro',
-                searchPlaceholder: 'アセット検索（desk / sofa / star）', loaded: '読み込み済み', allAssets: '全アセット',
+                searchPlaceholder: 'アセット検索（desk / sofa / DofLab）', loaded: '読み込み済み', allAssets: '全アセット',
                 chooseImage: '素材アップロード', confirmUpload: '確定して更新', resetToDefault: '初期に戻す', restorePrevAsset: '前版に戻す', uploadPending: 'アップロード待ち', uploadTarget: '対象',
                 assetHintNotInScene: '現在のシーンでこのオブジェクトは未検出です。ファイル差し替えは可能（更新後に反映）',
                 assetHintDefault: '汎用素材：元サイズ・透過・視覚アンカーを維持し、ズレや崩れを防いでください',
                 showCoords: '座標表示', hideCoords: '座標非表示', moveView: '視点移動', lockView: '視点固定',
                 memoTitle: '昨日のメモ', guestTitle: '訪問者リスト', officeTitle: 'ハイシン・ロブスターのオフィス',
-                loadingOffice: 'Star のピクセルオフィスを読み込み中...'
+                loadingOffice: 'DofLab のピクセルオフィスを読み込み中...'
             }
         };
 
@@ -1499,7 +1505,7 @@
 
         // 检测浏览器是否支持 WebP
         let supportsWebP = false;
-        
+
         // 方法 1: 使用 canvas 检测
         function checkWebPSupport() {
             return new Promise((resolve) => {
@@ -1511,7 +1517,7 @@
                 }
             });
         }
-        
+
         // 方法 2: 使用 image 检测（备用）
         function checkWebPSupportFallback() {
             return new Promise((resolve) => {
@@ -1522,7 +1528,7 @@
             });
         }
 
-        const IS_TOUCH_DEVICE = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(pointer: coarse)').matches;
+        const IS_TOUCH_DEVICE = ('ontouchDofLabt' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(pointer: coarse)').matches;
 
         const config = {
             type: Phaser.AUTO,
@@ -1549,11 +1555,11 @@
         async function loadMemo() {
             const memoDate = document.getElementById('memo-date');
             const memoContent = document.getElementById('memo-content');
-            
+
             try {
                 const response = await fetch('/yesterday-memo?t=' + Date.now(), { cache: 'no-store' });
                 const data = await response.json();
-                
+
                 if (data.success && data.memo) {
                     memoDate.textContent = data.date || '';
                     memoContent.innerHTML = data.memo.replace(/\n/g, '<br>');
@@ -1602,13 +1608,13 @@
             }, 260);
         }
 
-        // 兜底：某些移动网络/CDN 抖动时，避免一直卡在“加载中”遮罩
+        // 兜底：某些移动网络/CDN 抖动时，避免一直卡在"加载中"遮罩
         setTimeout(() => {
             if (loadingOverlay && loadingOverlay.style.display !== 'none') {
                 hideLoadingOverlay();
             }
         }, 8000);
-        
+
         // 懒加载逻辑已取消（体验优先：装饰首屏直接出现）
 
         const STATES = {
@@ -1622,7 +1628,7 @@
 
         const BUBBLE_TEXTS = {
             zh: {
-                idle: ['待命中：耳朵竖起来了','我在这儿，随时可以开工','先把桌面收拾干净再说','呼——给大脑放个风','今天也要优雅地高效','等待，是为了更准确的一击','咖啡还热，灵感也还在','我在后台给你加 Buff','状态：静心 / 充电','小猫说：慢一点也没关系'],
+                idle: ['待命中：耳朵竖起来了','我在这儿，随时可以开工','先把桌面收拾干净再说','呼--给大脑放个风','今天也要优雅地高效','等待，是为了更准确的一击','咖啡还热，灵感也还在','我在后台给你加 Buff','状态：静心 / 充电','小猫说：慢一点也没关系'],
                 writing: ['进入专注模式：勿扰','先把关键路径跑通','我来把复杂变简单','把 bug 关进笼子里','写到一半，先保存','把每一步都做成可回滚','今天的进度，明天的底气','先收敛，再发散','让系统变得更可解释','稳住，我们能赢'],
                 researching: ['我在挖证据链','让我把信息熬成结论','找到了：关键在这里','先把变量控制住','我在查：它为什么会这样','把直觉写成验证','先定位，再优化','别急，先画因果图'],
                 executing: ['执行中：不要眨眼','把任务切成小块逐个击破','开始跑 pipeline','一键推进：走你','让结果自己说话','先做最小可行，再做最美版本'],
@@ -1631,13 +1637,13 @@
                 cat: ['喵~','咕噜咕噜…','尾巴摇一摇','晒太阳最开心','有人来看我啦','我是这个办公室的吉祥物','伸个懒腰','今天的罐罐准备好了吗','呼噜呼噜','这个位置视野最好']
             },
             en: {
-                idle: ['On standby: ears up.','I’m here, ready to roll.','Let’s tidy the desk first.','Taking a quick brain breeze.','Efficient and elegant, as always.','Waiting for a more precise strike.','Coffee is warm, ideas too.','Giving you a quiet backstage buff.','Status: calm / charging.','Cat says: no rush, we’re good.'],
-                writing: ['Focus mode on: do not disturb.','Let’s clear the critical path first.','I’ll make the complex simple.','Putting bugs in a cage.','Save first, then continue.','Every step should be rollback-safe.','Today’s progress is tomorrow’s confidence.','Converge first, then diverge.','Making the system more explainable.','Steady—this is winnable.'],
-                researching: ['Digging the evidence chain.','Let me boil info into conclusions.','Found it: key clue here.','Control variables first.','Checking why this happens.','Turn intuition into verification.','Locate first, optimize next.','No rush—draw the causality map first.'],
-                executing: ['Executing—don’t blink.','Split tasks, conquer one by one.','Pipeline is running.','One-click push: go go.','Let the results speak.','Build MVP first, then craft beauty.'],
-                syncing: ['Syncing: lock today into the cloud.','Backup is safety, not ceremony.','Writing… don’t cut power.','Handing changes to timestamps.','Cloud alignment: click.','Don’t shake it before sync finishes.','Saving future-us from disasters.','One more backup, one less regret.'],
-                error: ['Alarm on—stay calm.','I can smell a bug.','Reproduce first, then fix.','Give me logs; I’ll translate.','Errors are clues, not enemies.','Circle the impact area first.','Stop the bleeding, then surgery.','On it: tracing root cause now.','Don’t worry, seen this many times.','Alert mode: make the issue reveal itself.'],
-                cat: ['Meow~','Purr purr…','Tail wiggle activated.','Sunbathing is the best.','Someone came to see me!','I’m the office mascot.','Big stretch~','Is today’s snack ready yet?','Rrrrr purr…','Best view spot secured.']
+                idle: ['On standby: ears up.','I'm here, ready to roll.','Let's tidy the desk first.','Taking a quick brain breeze.','Efficient and elegant, as always.','Waiting for a more precise strike.','Coffee is warm, ideas too.','Giving you a quiet backstage buff.','Status: calm / charging.','Cat says: no rush, we're good.'],
+                writing: ['Focus mode on: do not disturb.','Let's clear the critical path first.','I'll make the complex simple.','Putting bugs in a cage.','Save first, then continue.','Every step should be rollback-safe.','Today's progress is tomorrow's confidence.','Converge first, then diverge.','Making the system more explainable.','Steady-this is winnable.'],
+                researching: ['Digging the evidence chain.','Let me boil info into conclusions.','Found it: key clue here.','Control variables first.','Checking why this happens.','Turn intuition into verification.','Locate first, optimize next.','No rush-draw the causality map first.'],
+                executing: ['Executing-don't blink.','Split tasks, conquer one by one.','Pipeline is running.','One-click push: go go.','Let the results speak.','Build MVP first, then craft beauty.'],
+                syncing: ['Syncing: lock today into the cloud.','Backup is safety, not ceremony.','Writing… don't cut power.','Handing changes to timestamps.','Cloud alignment: click.','Don't shake it before sync finishes.','Saving future-us from disasters.','One more backup, one less regret.'],
+                error: ['Alarm on-stay calm.','I can smell a bug.','Reproduce first, then fix.','Give me logs; I'll translate.','Errors are clues, not enemies.','Circle the impact area first.','Stop the bleeding, then surgery.','On it: tracing root cause now.','Don't worry, seen this many times.','Alert mode: make the issue reveal itself.'],
+                cat: ['Meow~','Purr purr…','Tail wiggle activated.','Sunbathing is the best.','Someone came to see me!','I'm the office mascot.','Big stretch~','Is today's snack ready yet?','Rrrrr purr…','Best view spot secured.']
             },
             ja: {
                 idle: ['待機中：耳はピン。','ここにいるよ、いつでも開始OK。','まず机を整えよう。','ふー、頭に風を通す。','今日も上品に高効率で。','待つのは、より正確な一撃のため。','コーヒーも発想もまだ温かい。','裏側でそっとバフ中。','状態：静心 / 充電。','猫より：ゆっくりでも大丈夫。'],
@@ -1650,9 +1656,9 @@
             }
         };
 
-        let game, star, sofa, serverroom, officeBgSprite, areas = {}, currentState = 'idle', pendingDesiredState = null, statusText, lastFetch = 0, lastBlink = 0, lastBubble = 0, targetX = 660, targetY = 170, bubble = null, typewriterText = '', typewriterTarget = '', typewriterIndex = 0, lastTypewriter = 0, syncAnimSprite = null, syncAnimPlayable = false, catBubble = null, selectionBoxGraphics = null;
+        let game, DofLab, sofa, serverroom, officeBgSprite, areas = {}, currentState = 'idle', pendingDesiredState = null, statusText, lastFetch = 0, lastBlink = 0, lastBubble = 0, targetX = 660, targetY = 170, bubble = null, typewriterText = '', typewriterTarget = '', typewriterIndex = 0, lastTypewriter = 0, syncAnimSprite = null, syncAnimPlayable = false, catBubble = null, selectionBoxGraphics = null;
         const IDLE_SOFA_ANCHOR = { x: 798, y: 272 }; // 统一中心锚点（原 sofa 左上 670,144 的中心）
-        const IDLE_STAR_SCALE = 1.0; // star idle 改为256帧原生显示，不再放大
+        const IDLE_DofLab_SCALE = 1.0; // DofLab idle 改为256帧原生显示，不再放大
         // flowers 精灵表规格：固定单帧 128x128，4x4
         let FLOWERS_FRAME_W = 65;
         let FLOWERS_FRAME_H = 65;
@@ -1801,8 +1807,8 @@
             const lang = (uiLang || 'zh');
             const nameMap = {
                 zh: {
-                    'star-idle-v5': '主角·待命状态',
-                    'star-working-spritesheet-grid': '主角·工作状态',
+                    'DofLab-idle-v5': '主角·待命状态',
+                    'DofLab-working-spritesheet-grid': '主角·工作状态',
                     'sync-animation': '主角·同步状态',
                     'sync-animation-v3-grid': '主角·同步状态',
                     'error-bug-spritesheet-grid': '主角·报错状态',
@@ -1825,8 +1831,8 @@
                     'guest_anim_6': '访客动画 6'
                 },
                 en: {
-                    'star-idle-v5': 'Main · Idle',
-                    'star-working-spritesheet-grid': 'Main · Working',
+                    'DofLab-idle-v5': 'Main · Idle',
+                    'DofLab-working-spritesheet-grid': 'Main · Working',
                     'sync-animation': 'Main · Syncing',
                     'sync-animation-v3-grid': 'Main · Syncing',
                     'error-bug-spritesheet-grid': 'Main · Error',
@@ -1849,8 +1855,8 @@
                     'guest_anim_6': 'Guest Animation 6'
                 },
                 ja: {
-                    'star-idle-v5': 'メイン・待機状態',
-                    'star-working-spritesheet-grid': 'メイン・作業状態',
+                    'DofLab-idle-v5': 'メイン・待機状態',
+                    'DofLab-working-spritesheet-grid': 'メイン・作業状態',
                     'sync-animation': 'メイン・同期状態',
                     'sync-animation-v3-grid': 'メイン・同期状態',
                     'error-bug-spritesheet-grid': 'メイン・エラー状態',
@@ -1881,8 +1887,8 @@
             zh: {
                 'office_bg_small': '主场景底图（当前生效）。建议 1280×720（16:9），保留房间结构与视角，避免角色站位错位。',
                 'office_bg': '历史背景备份。通常不直接生效，建议与 office_bg_small 保持同构图用于回退。',
-                'star-idle-v5': '主角待机动画表。请保持 256×256 分帧与网格布局一致，否则待机动作会错帧。',
-                'star-working-spritesheet-grid': '主角工作动画表（工位状态）。请保持 300×300 分帧，建议人物重心与原图一致。',
+                'DofLab-idle-v5': '主角待机动画表。请保持 256×256 分帧与网格布局一致，否则待机动作会错帧。',
+                'DofLab-working-spritesheet-grid': '主角工作动画表（工位状态）。请保持 300×300 分帧，建议人物重心与原图一致。',
                 'sync-animation': '同步状态素材（当前引用）。建议按 256×256 帧规范制作，避免同步状态显示静止或抖动。',
                 'sync-animation-v3-grid': '同步动画表（兼容资源）。保持 256×256 网格可用于替换同步动作细节。',
                 'error-bug-spritesheet-grid': '报错状态动画表。请保持 220×220 分帧，建议高对比度以增强异常提示感。',
@@ -1914,8 +1920,8 @@
             en: {
                 'office_bg_small': 'Primary room background (active). Use 1280×720 (16:9), keep room structure/perspective to avoid character misalignment.',
                 'office_bg': 'Legacy backup background. Usually not directly active; keep composition aligned with office_bg_small for rollback.',
-                'star-idle-v5': 'Main idle spritesheet. Keep 256×256 frame size and grid layout, or idle animation will break.',
-                'star-working-spritesheet-grid': 'Main working spritesheet (desk state). Keep 300×300 frames; preserve visual center/anchor.',
+                'DofLab-idle-v5': 'Main idle spritesheet. Keep 256×256 frame size and grid layout, or idle animation will break.',
+                'DofLab-working-spritesheet-grid': 'Main working spritesheet (desk state). Keep 300×300 frames; preserve visual center/anchor.',
                 'sync-animation': 'Sync-state asset (currently referenced). Follow 256×256 frame spec to avoid static/jitter sync visuals.',
                 'sync-animation-v3-grid': 'Sync spritesheet (compat resource). Keep 256×256 grid for sync animation replacement.',
                 'error-bug-spritesheet-grid': 'Error-state spritesheet. Keep 220×220 frames; high contrast helps warning readability.',
@@ -1947,8 +1953,8 @@
             ja: {
                 'office_bg_small': 'メイン背景（現在有効）。1280×720（16:9）推奨。部屋構造と視点を維持し、キャラの位置ズレを防いでください。',
                 'office_bg': '旧背景のバックアップ。通常は直接反映されません。office_bg_small と同構図で保持すると復旧しやすいです。',
-                'star-idle-v5': 'メイン待機スプライトシート。256×256 分割とグリッド構成を維持しないと待機アニメが崩れます。',
-                'star-working-spritesheet-grid': 'メイン作業スプライトシート（デスク状態）。300×300 分割を維持し、重心位置を揃えてください。',
+                'DofLab-idle-v5': 'メイン待機スプライトシート。256×256 分割とグリッド構成を維持しないと待機アニメが崩れます。',
+                'DofLab-working-spritesheet-grid': 'メイン作業スプライトシート（デスク状態）。300×300 分割を維持し、重心位置を揃えてください。',
                 'sync-animation': '同期状態素材（現在参照中）。256×256 仕様を守ると静止/ガタつきを回避できます。',
                 'sync-animation-v3-grid': '同期スプライトシート（互換用）。256×256 グリッド維持で同期演出を差し替え可能です。',
                 'error-bug-spritesheet-grid': 'エラー状態スプライトシート。220×220 分割を維持し、視認性の高い配色を推奨。',
@@ -2005,7 +2011,7 @@
             const stem = file.replace(/\.[^.]+$/, '');
             const map = {
                 'office_bg_small': 'office_bg',
-                'star-idle-v5': 'star_idle',
+                'DofLab-idle-v5': 'DofLab_idle',
                 'sofa-idle-v3': 'sofa_idle',
                 'sofa-shadow-v1': 'sofa_shadow',
                 'plants-spritesheet': 'plants',
@@ -2017,7 +2023,7 @@
                 'cats-spritesheet': 'cats',
                 'desk-v3': 'desk_v2',
                 'desk': 'desk',
-                'star-working-spritesheet-grid': 'star_working',
+                'DofLab-working-spritesheet-grid': 'DofLab_working',
                 'sync-animation-v3-grid': 'sync_anim',
                 'memo-bg': 'memo_bg',
                 'flowers-bloom-v2': 'flowers',
@@ -2045,7 +2051,7 @@
             if (!key) return null;
             const keyToStem = {
                 office_bg: 'office_bg_small',
-                star_idle: 'star-idle-v5',
+                DofLab_idle: 'DofLab-idle-v5',
                 sofa_idle: 'sofa-idle-v3',
                 sofa_shadow: 'sofa-shadow-v1',
                 plants: 'plants-spritesheet',
@@ -2057,7 +2063,7 @@
                 cats: 'cats-spritesheet',
                 desk_v2: 'desk-v3',
                 desk: 'desk',
-                star_working: 'star-working-spritesheet-grid',
+                DofLab_working: 'DofLab-working-spritesheet-grid',
                 sync_anim: 'sync-animation-v3-grid',
                 memo_bg: 'memo-bg',
                 flowers: 'flowers-bloom-v2',
@@ -2286,7 +2292,7 @@
             // 先看命名是否属于精灵表
             const inferred = inferSpritesheetFrameMetaByPath(item?.path || '');
             if (!inferred) return null;
-            // 仅返回“是精灵表”的信号，单帧尺寸后续自动推断
+            // 仅返回"是精灵表"的信号，单帧尺寸后续自动推断
             return { w: null, h: null, isSheet: true };
         }
 
@@ -2294,8 +2300,8 @@
             const p = (path || '').toLowerCase();
             // 常见核心资产优先用显式提示（避免误判）
             const hints = [
-                [/star-working-spritesheet-grid\.webp$/, 300, 300],
-                [/star-idle-v5\.(webp|png)$/, 256, 256],
+                [/DofLab-working-spritesheet-grid\.webp$/, 300, 300],
+                [/DofLab-idle-v5\.(webp|png)$/, 256, 256],
                 [/sync-animation-v3-grid\.webp$/, 256, 256],
                 [/error-bug-spritesheet-grid\.webp$/, 220, 220],
                 [/flowers-bloom-v2\.webp$/, 128, 128],
@@ -2419,8 +2425,8 @@
             const baseRows = assetListData.map(it => ({ ...it, key: '' }));
 
             const statePriority = [
-                'star-idle-v5.png',
-                'star-working-spritesheet-grid.webp',
+                'DofLab-idle-v5.png',
+                'DofLab-working-spritesheet-grid.webp',
                 'sync-animation-v3-grid.webp',
                 'error-bug-spritesheet-grid.webp'
             ];
@@ -2446,7 +2452,7 @@
             clearAssetThumbTimers();
 
             if (rows.length === 0) {
-                list.innerHTML = '<div class="asset-sub" style="padding:8px">暂无资产（可点“刷新”重试）</div>';
+                list.innerHTML = '<div class="asset-sub" style="padding:8px">暂无资产（可点"刷新"重试）</div>';
                 return;
             }
 
@@ -2510,7 +2516,7 @@
                 }
             } catch (e) {
                 console.error('加载资产列表失败', e);
-                if (out) out.textContent = '❌ 资产加载失败，请点“刷新”重试';
+                if (out) out.textContent = '❌ 资产加载失败，请点"刷新"重试';
             }
         }
 
@@ -2618,7 +2624,7 @@
                         return;
                     }
                     scene.load.image(newKey, url);
-                    scene.load.start();
+                    scene.load.DofLabt();
                 } catch (e) {
                     console.warn('替换场景纹理失败(load):', e);
                     resolve(false);
@@ -2764,23 +2770,23 @@ function toggleBrokerPanel() {
                     '正在给钳子装上远行 Buff……',
                     '正在匹配下一段创作气候……',
                     '正在把时差调成冒险模式……',
-                    '正在接收陌生街区的 Wi‑Fi 心跳……',
+                    '正在接收陌生街区的 Wi-Fi 心跳……',
                     '正在试播下一站的海风 BGM……',
-                    '正在加载“也许会爱上”的新房间……',
+                    '正在加载"也许会爱上"的新房间……',
                     '正在为未知邻居准备自我介绍……',
                     '正在解锁下一片数字海域……',
                     '正在把好奇心调到满格……',
                     '正在等待旅程投递下一张门牌号……'
                 ],
                 en: [
-                    'Packing today’s luggage of inspiration…',
+                    'Packing today's luggage of inspiration…',
                     'Drawing the digital coordinates for the next stop…',
                     'Checking the destination of this drift…',
                     'Folding the office into portable mode…',
                     'Installing a travel buff on the claws…',
                     'Matching the creative climate for the next chapter…',
                     'Switching the time zone to adventure mode…',
-                    'Receiving Wi‑Fi heartbeats from an unfamiliar block…',
+                    'Receiving Wi-Fi heartbeats from an unfamiliar block…',
                     'Previewing the sea-breeze BGM of the next stop…',
                     'Loading a new room you might just fall in love with…',
                     'Preparing an intro for unknown neighbors…',
@@ -2796,7 +2802,7 @@ function toggleBrokerPanel() {
                     'ハサミに遠征 Buff を装着しています……',
                     '次の創作区間の気候をマッチングしています……',
                     '時差を冒険モードに切り替えています……',
-                    '見知らぬ街区の Wi‑Fi ハートビートを受信しています……',
+                    '見知らぬ街区の Wi-Fi ハートビートを受信しています……',
                     '次の目的地の潮風 BGM を試聴しています……',
                     '「好きになるかもしれない」新しい部屋を読み込んでいます……',
                     '未知のご近所さん向けに自己紹介を準備しています……',
@@ -2913,8 +2919,8 @@ function toggleBrokerPanel() {
             setTimeout(() => el.classList.remove('is-done'), holdMs);
         }
 
-        // Async generation: start task then poll for result (avoids Cloudflare 524 timeout)
-        async function _startAndPollGeneration(body, out, progressMsg) {
+        // Async generation: DofLabt task then poll for result (avoids Cloudflare 524 timeout)
+        async function _DofLabtAndPollGeneration(body, out, progressMsg) {
             const res = await fetch('/assets/generate-rpg-background', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2928,13 +2934,13 @@ function toggleBrokerPanel() {
             const taskId = data.task_id;
             const maxPollTime = 300000; // 5 minutes max
             const pollInterval = 3000;  // 3 seconds
-            const startTime = Date.now();
+            const DofLabtTime = Date.now();
             let dots = 0;
 
-            while (Date.now() - startTime < maxPollTime) {
+            while (Date.now() - DofLabtTime < maxPollTime) {
                 await new Promise(r => setTimeout(r, pollInterval));
                 dots = (dots + 1) % 4;
-                const elapsed = Math.round((Date.now() - startTime) / 1000);
+                const elapsed = Math.round((Date.now() - DofLabtTime) / 1000);
                 out.textContent = progressMsg + '（已等待 ' + elapsed + '秒）' + '.'.repeat(dots);
                 try {
                     const pollRes = await fetch('/assets/generate-rpg-background/poll?task_id=' + encodeURIComponent(taskId));
@@ -2978,7 +2984,7 @@ function toggleBrokerPanel() {
             showRoomLoadingOverlay();
             out.textContent = t('brokerGenerating');
             try {
-                const data = await _startAndPollGeneration(
+                const data = await _DofLabtAndPollGeneration(
                     { prompt, speed_mode: speedMode },
                     out,
                     '🏘️ 正在按中介方案生成底图'
@@ -3009,7 +3015,7 @@ function toggleBrokerPanel() {
             showRoomLoadingOverlay();
             out.textContent = '🧳 正在打包行李，请稍后（约30~120秒）';
             try {
-                const data = await _startAndPollGeneration(
+                const data = await _DofLabtAndPollGeneration(
                     { speed_mode: speedMode },
                     out,
                     '🧳 正在生成新房间'
@@ -3548,7 +3554,7 @@ function toggleBrokerPanel() {
                     let sprite;
                     const isDemoNika = DEMO_MODE && (agent.agentId === 'demo_nika' || agent.name === '尼卡');
                     const isDemoMercury = DEMO_MODE && (agent.agentId === 'demo_mercury' || agent.name === '水星');
-                    
+
                     if (isDemoNika || isDemoMercury) {
                         // 统一使用动态像素角色，避免依赖已删除的 demo 静态图
                         const animKey = 'guest_anim_1';
@@ -3679,7 +3685,7 @@ function toggleBrokerPanel() {
             const id = ids[Math.floor(Math.random() * ids.length)];
             const g = guestSprites[id];
 
-            // demo 气泡：优先展示与状态对应的内容，便于验证“状态→区域→气泡”链路
+            // demo 气泡：优先展示与状态对应的内容，便于验证"状态→区域→气泡"链路
             const demoVisitor = (DEMO_MODE && window.__demoVisitors)
                 ? (window.__demoVisitors.find(v => v.agentId === id) || window.__demoVisitors.find(v => v.name === (g.nameText && g.nameText.text)))
                 : null;
@@ -3702,7 +3708,7 @@ function toggleBrokerPanel() {
             }
 
             const bx = g.sprite.x;
-            // 气泡位置：demo 维持原逻辑；真实访客放在“名字上方”，避免压角色也避免压名字
+            // 气泡位置：demo 维持原逻辑；真实访客放在"名字上方"，避免压角色也避免压名字
             const isDemoGuest = (demoVisitor && demoVisitor.isDemo) || (id === 'demo_nika' || id === 'demo_mercury');
             const nameH = (g.nameText && g.nameText.height) ? g.nameText.height : 16;
             const by = isDemoGuest ? (g.sprite.y - 90) : ((g.nameText ? g.nameText.y : (g.sprite.y - 150)) - (nameH / 2) - 22);
@@ -3845,7 +3851,7 @@ function toggleBrokerPanel() {
                     // 无论后端返回是否为数组，demo=1 都应保证本地 demo 访客可见
                     guestAgents = Array.isArray(data) ? data : [];
 
-                    // 新访客检测：触发 Star 欢迎气泡（只欢迎真实访客，不欢迎 demo）
+                    // 新访客检测：触发 DofLab 欢迎气泡（只欢迎真实访客，不欢迎 demo）
                     try {
                         const merged = getMergedVisitors();
                         const currentIds = new Set((merged || []).filter(a => !a.isMain && !a.isDemo).map(a => a.agentId));
@@ -3869,7 +3875,7 @@ function toggleBrokerPanel() {
                                     const lang = uiLang;
                                     const welcomeTexts = {
                                         zh: [`欢迎 ${newAgent.name} 来到办公室～`,`Hi ${newAgent.name}，一起开工吧`,`${newAgent.name} 已加入，欢迎！`],
-                                        en: [`Welcome ${newAgent.name} to the office!`,`Hi ${newAgent.name}, let’s build something.`,`${newAgent.name} just joined — welcome!`],
+                                        en: [`Welcome ${newAgent.name} to the office!`,`Hi ${newAgent.name}, let's build something.`,`${newAgent.name} just joined - welcome!`],
                                         ja: [`${newAgent.name} さん、オフィスへようこそ！`,`Hi ${newAgent.name}、一緒に進めよう。`,`${newAgent.name} さんが参加しました、歓迎！`]
                                     };
                                     const langPack = BUBBLE_TEXTS[lang] || BUBBLE_TEXTS.zh;
@@ -3959,16 +3965,16 @@ function toggleBrokerPanel() {
             loadingProgressBar = document.getElementById('loading-progress-bar');
             loadingText = document.getElementById('loading-text');
             loadingProgressContainer = document.getElementById('loading-progress-container');
-            
+
             // 设置资源总数（全部首屏加载：装饰也第一时间出现）
             totalAssets = 15;
             loadedAssets = 0;
-            
+
             // 加载进度监听
             this.load.on('filecomplete', () => {
                 updateLoadingProgress();
             });
-            
+
             this.load.on('complete', () => {
                 hideLoadingOverlay();
             });
@@ -3976,7 +3982,7 @@ function toggleBrokerPanel() {
             // cache-busting to avoid stale background on client/CDN
             // use smaller/new map version provided by user
             this.load.image('office_bg', '/static/office_bg_small.webp?v={{VERSION_TIMESTAMP}}');
-            this.load.spritesheet('star_idle', '/static/star-idle-v5.png?v={{VERSION_TIMESTAMP}}', { frameWidth: 256, frameHeight: 256 });
+            this.load.spritesheet('DofLab_idle', '/static/DofLab-idle-v5.png?v={{VERSION_TIMESTAMP}}', { frameWidth: 256, frameHeight: 256 });
 
             // Furniture
             this.load.image('sofa_idle', '/static/sofa-idle-v3.png?v={{VERSION_TIMESTAMP}}');
@@ -3999,16 +4005,16 @@ function toggleBrokerPanel() {
             this.load.spritesheet('cats', '/static/cats-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 160, frameHeight: 160 });
 
             // Desk
-            // Star working animation: repacked to grid to avoid WebGL max texture size limits
+            // DofLab working animation: repacked to grid to avoid WebGL max texture size limits
             // NOTE: prefer WebP for size, PNG fallback
             // 动态替换后按最新素材识别：当前 writing 素材为 300x300 单帧
-            this.load.spritesheet('star_working', '/static/star-working-spritesheet-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 300, frameHeight: 300 });
+            this.load.spritesheet('DofLab_working', '/static/DofLab-working-spritesheet-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 300, frameHeight: 300 });
 
             // Sync state animation (256x256, 多帧): 非同步显示首帧，同步从第2帧循环
             this.load.spritesheet('sync_anim', '/static/sync-animation-v3-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 256, frameHeight: 256 });
 
             // Memo background image
-            // memo 底图固定走 png，避免某些端 webp 透明通道异常导致“底图丢失”
+            // memo 底图固定走 png，避免某些端 webp 透明通道异常导致"底图丢失"
             this.load.image('memo_bg', '/static/memo-bg.webp?v={{VERSION_TIMESTAMP}}');
             // Desk v2 (webp only)
             this.load.image('desk_v2', '/static/desk-v3.webp?v={{VERSION_TIMESTAMP}}');
@@ -4043,14 +4049,14 @@ function toggleBrokerPanel() {
                 breakroom: { x: IDLE_SOFA_ANCHOR.x, y: IDLE_SOFA_ANCHOR.y } // 与 sofa-idle-v3 同中心锚点
             };
 
-            // 创建 Star 角色待命动画（每次先移除旧定义，确保不复用历史动画）
-            const starIdleFrameMax = Math.max(0, (this.textures.get('star_idle')?.frameTotal || 1) - 1);
-            if (this.anims.exists('star_idle')) {
-                this.anims.remove('star_idle');
+            // 创建 DofLab 角色待命动画（每次先移除旧定义，确保不复用历史动画）
+            const DofLabIdleFrameMax = Math.max(0, (this.textures.get('DofLab_idle')?.frameTotal || 1) - 1);
+            if (this.anims.exists('DofLab_idle')) {
+                this.anims.remove('DofLab_idle');
             }
             this.anims.create({
-                key: 'star_idle',
-                frames: this.anims.generateFrameNumbers('star_idle', { start: 0, end: starIdleFrameMax }),
+                key: 'DofLab_idle',
+                frames: this.anims.generateFrameNumbers('DofLab_idle', { DofLabt: 0, end: DofLabIdleFrameMax }),
                 frameRate: 12,
                 repeat: -1
             });
@@ -4060,20 +4066,20 @@ function toggleBrokerPanel() {
             for (let i = 1; i <= 6; i++) {
                 this.anims.create({
                     key: `guest_anim_${i}_idle`,
-                    frames: this.anims.generateFrameNumbers(`guest_anim_${i}`, { start: 0, end: 7 }),
+                    frames: this.anims.generateFrameNumbers(`guest_anim_${i}`, { DofLabt: 0, end: 7 }),
                     frameRate: 8,
                     repeat: -1
                 });
             }
 
-            star = game.physics.add.sprite(areas.breakroom.x, areas.breakroom.y, 'star_idle');
-            star.setOrigin(0.5);
-            star.setScale(IDLE_STAR_SCALE);
-            star.setAlpha(0.95);
-            star.setDepth(20); // Put Star on top of everything
-            // Default: idle shows Star idle animation
-            star.setVisible(true);
-            star.anims.play('star_idle', true);
+            DofLab = game.physics.add.sprite(areas.breakroom.x, areas.breakroom.y, 'DofLab_idle');
+            DofLab.setOrigin(0.5);
+            DofLab.setScale(IDLE_DofLab_SCALE);
+            DofLab.setAlpha(0.95);
+            DofLab.setDepth(20); // Put DofLab on top of everything
+            // Default: idle shows DofLab idle animation
+            DofLab.setVisible(true);
+            DofLab.anims.play('DofLab_idle', true);
 
             // Sofa stays static when idle (no longer the main idle animation)
             sofa.anims.stop();
@@ -4107,7 +4113,7 @@ function toggleBrokerPanel() {
             // Expose to global for click handler
             window.plantSprite = plant;
             window.plantFrameCount = plantFrameCount;
-            
+
             plant.on('pointerdown', () => {
                 const next = Math.floor(Math.random() * window.plantFrameCount);
                 window.plantSprite.setFrame(next);
@@ -4120,7 +4126,7 @@ function toggleBrokerPanel() {
             plant2.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
             window.plantSprite2 = plant2;
-            
+
             plant2.on('pointerdown', () => {
                 const next = Math.floor(Math.random() * window.plantFrameCount);
                 window.plantSprite2.setFrame(next);
@@ -4133,7 +4139,7 @@ function toggleBrokerPanel() {
             plant3.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
             window.plantSprite3 = plant3;
-            
+
             plant3.on('pointerdown', () => {
                 const next = Math.floor(Math.random() * window.plantFrameCount);
                 window.plantSprite3.setFrame(next);
@@ -4148,7 +4154,7 @@ function toggleBrokerPanel() {
             // Expose to global for click handler
             window.posterSprite = poster;
             window.posterFrameCount = postersFrameCount;
-            
+
             poster.on('pointerdown', () => {
                 const next = Math.floor(Math.random() * window.posterFrameCount);
                 window.posterSprite.setFrame(next);
@@ -4177,7 +4183,7 @@ function toggleBrokerPanel() {
             }
             this.anims.create({
                 key: 'coffee_machine',
-                frames: this.anims.generateFrameNumbers('coffee_machine', { start: 0, end: coffeeFrameMax }),
+                frames: this.anims.generateFrameNumbers('coffee_machine', { DofLabt: 0, end: coffeeFrameMax }),
                 frameRate: 12.5,
                 repeat: -1
             });
@@ -4189,7 +4195,7 @@ function toggleBrokerPanel() {
             const serverFrameMax = Math.max(0, (this.textures.get('serverroom')?.frameTotal || 1) - 2);
             this.anims.create({
                 key: 'serverroom_on',
-                frames: this.anims.generateFrameNumbers('serverroom', { start: 0, end: serverFrameMax }),
+                frames: this.anims.generateFrameNumbers('serverroom', { DofLabt: 0, end: serverFrameMax }),
                 frameRate: 6,
                 repeat: -1
             });
@@ -4201,14 +4207,14 @@ function toggleBrokerPanel() {
 
             // Desk at (218,417) (v2)
             const desk = this.add.image(218, 417, 'desk_v2').setOrigin(0.5);
-            desk.setDepth(1001);  // desk above starWorking
+            desk.setDepth(1001);  // desk above DofLabWorking
 
             // Random flower pot at (310,390), default scale 0.8 (top layer)
             const flowerFrameCount = Math.max(1, FLOWERS_FRAME_COLS * FLOWERS_FRAME_ROWS); // 动态帧数
             const randomFlowerFrame = Math.floor(Math.random() * flowerFrameCount);
             const flower = this.add.sprite(310, 390, 'flowers', randomFlowerFrame).setOrigin(0.5);
             flower.setScale(0.8);
-            flower.setDepth(1100); // highest among desk/starWorking
+            flower.setDepth(1100); // highest among desk/DofLabWorking
             flower.setInteractive({ useHandCursor: true });
             window.flowerSprite = flower;
             window.flowerFrameCount = flowerFrameCount;
@@ -4217,11 +4223,11 @@ function toggleBrokerPanel() {
                 window.flowerSprite.setFrame(next);
             });
 
-            // Star working at desk (217,333)
+            // DofLab working at desk (217,333)
             this.anims.create({
-                key: 'star_working',
+                key: 'DofLab_working',
                 // 38 帧（0~37），避免沿用旧 192 帧导致疯狂闪烁
-                frames: this.anims.generateFrameNumbers('star_working', { start: 0, end: 37 }),
+                frames: this.anims.generateFrameNumbers('DofLab_working', { DofLabt: 0, end: 37 }),
                 frameRate: 12,
                 repeat: -1
             });
@@ -4229,7 +4235,7 @@ function toggleBrokerPanel() {
             // Error / bug animation (96 frames)
             this.anims.create({
                 key: 'error_bug',
-                frames: this.anims.generateFrameNumbers('error_bug', { start: 0, end: 71 }),
+                frames: this.anims.generateFrameNumbers('error_bug', { DofLabt: 0, end: 71 }),
                 frameRate: 12,
                 repeat: -1
             });
@@ -4242,26 +4248,26 @@ function toggleBrokerPanel() {
             errorBug.anims.play('error_bug', true);
             window.errorBug = errorBug;
             window.errorBugDir = 1; // 1 -> to right, -1 -> to left
-            const starWorking = this.add.sprite(217, 343, 'star_working', 0).setOrigin(0.5);
-            starWorking.setVisible(false);
-            starWorking.setScale(0.9);
-            starWorking.setDepth(900);  // starWorking under desk so desk partially covers it
-            // Store reference to starWorking for state logic
-            window.starWorking = starWorking;
+            const DofLabWorking = this.add.sprite(217, 343, 'DofLab_working', 0).setOrigin(0.5);
+            DofLabWorking.setVisible(false);
+            DofLabWorking.setScale(0.9);
+            DofLabWorking.setDepth(900);  // DofLabWorking under desk so desk partially covers it
+            // Store reference to DofLabWorking for state logic
+            window.DofLabWorking = DofLabWorking;
 
             // Sync animation sprite at (1157,592)
             const syncFrameTotal = Number(this.textures.get('sync_anim')?.frameTotal || 0);
-            const syncFrameStart = 1;
+            const syncFrameDofLabt = 1;
             const syncFrameEnd = Math.max(0, syncFrameTotal - 2);
             // 仅在确实存在可播放帧（>=1）时才创建同步动画，避免单帧素材触发播放异常
-            syncAnimPlayable = syncFrameTotal >= 3 && syncFrameEnd >= syncFrameStart;
+            syncAnimPlayable = syncFrameTotal >= 3 && syncFrameEnd >= syncFrameDofLabt;
             if (this.anims.exists('sync_anim')) {
                 this.anims.remove('sync_anim');
             }
             if (syncAnimPlayable) {
             this.anims.create({
                 key: 'sync_anim',
-                    frames: this.anims.generateFrameNumbers('sync_anim', { start: syncFrameStart, end: syncFrameEnd }),
+                    frames: this.anims.generateFrameNumbers('sync_anim', { DofLabt: syncFrameDofLabt, end: syncFrameEnd }),
                 frameRate: 12,
                 repeat: -1
             });
@@ -4272,8 +4278,8 @@ function toggleBrokerPanel() {
             syncAnimSprite.anims.stop();
             syncAnimSprite.setFrame(0);
 
-            // Debug: expose star sprite too (for path calibration / visuals)
-            window.starSprite = star;
+            // Debug: expose DofLab sprite too (for path calibration / visuals)
+            window.DofLabSprite = DofLab;
 
             statusText = document.getElementById('status-text');
             placeOverlayAndStatusAtCanvasBottomLeft();
@@ -4291,13 +4297,13 @@ function toggleBrokerPanel() {
                 coordsToggle.style.background = showCoords ? '#e94560' : '#333';
             });
 
-            // 允许手机端“拖动/滑动”来移动视野（本质：移动 Phaser Camera）
+            // 允许手机端"拖动/滑动"来移动视野（本质：移动 Phaser Camera）
             // iPhone 等触屏设备默认开启；桌面端默认关闭（可手动开）。
             const panToggle = document.getElementById('pan-toggle');
             const isTouchDevice = IS_TOUCH_DEVICE;
             let panEnabled = false;
             let isPanning = false;
-            let panStart = null; // {x,y,sx,sy}
+            let panDofLabt = null; // {x,y,sx,sy}
             const camera = game.cameras.main;
 
             const MAP_W = config.width;
@@ -4316,7 +4322,7 @@ function toggleBrokerPanel() {
                 camera.scrollY = clamp(camera.scrollY, 0, maxScrollY());
             }
 
-            // 手机上：锁定“办公室画布高度 = 2/3 区域高度”，
+            // 手机上：锁定"办公室画布高度 = 2/3 区域高度"，
             // 让世界坐标在竖向恰好看满（不需要上下拖），只保留横向拖动浏览左右。
             // 记录初始是否已手动平移（避免 resize 时把用户拖好的位置重置）
             let hasManuallyPanned = false;
@@ -4367,7 +4373,7 @@ function toggleBrokerPanel() {
                 }
                 game.input.setDefaultCursor(on ? 'grab' : 'default');
                 if (isTouchDevice && statusText) {
-                    const info = on ? '视野拖动已开启（可左右拖动画布）' : '视野拖动已关闭（点击左上角“移动视野”可开启）';
+                    const info = on ? '视野拖动已开启（可左右拖动画布）' : '视野拖动已关闭（点击左上角"移动视野"可开启）';
                     statusText.textContent = `状态：[${(STATES[currentState] && STATES[currentState].name) || '待命'}] ${info}`;
                 }
             }
@@ -4376,7 +4382,7 @@ function toggleBrokerPanel() {
                 panToggle.addEventListener('click', () => setPanEnabled(!panEnabled));
             }
 
-            // 手机端默认关闭拖动画面：由左上角“移动视野”开关显式开启
+            // 手机端默认关闭拖动画面：由左上角"移动视野"开关显式开启
             if (isTouchDevice) {
                 setPanEnabled(false);
             }
@@ -4388,10 +4394,10 @@ function toggleBrokerPanel() {
             const canvasEl = game.canvas;
             let touchPan = null; // {x,y,sx,sy,lock:'x'|'y'|null}
             if (canvasEl) {
-                // 手机端允许页面自然滚动，避免“不能滑动”
+                // 手机端允许页面自然滚动，避免"不能滑动"
                 canvasEl.style.touchAction = 'auto';
 
-                canvasEl.addEventListener('touchstart', (e) => {
+                canvasEl.addEventListener('touchDofLabt', (e) => {
                     if (!panEnabled || e.touches.length !== 1) return;
                     const t = e.touches[0];
                     touchPan = { x: t.clientX, y: t.clientY, sx: camera.scrollX, sy: camera.scrollY, lock: null };
@@ -4425,35 +4431,35 @@ function toggleBrokerPanel() {
             game.input.on('pointerdown', (pointer) => {
                 if (!panEnabled) return;
                 isPanning = true;
-                panStart = { x: pointer.x, y: pointer.y, sx: camera.scrollX, sy: camera.scrollY };
+                panDofLabt = { x: pointer.x, y: pointer.y, sx: camera.scrollX, sy: camera.scrollY };
                 game.input.setDefaultCursor('grabbing');
             });
 
             game.input.on('pointerup', () => {
                 if (!panEnabled) return;
                 isPanning = false;
-                panStart = null;
+                panDofLabt = null;
                 game.input.setDefaultCursor('grab');
             });
 
             game.input.on('pointermove', (pointer) => {
-                if (!panEnabled || !isPanning || !panStart) return;
-                const dx = pointer.x - panStart.x;
-                const dy = pointer.y - panStart.y;
+                if (!panEnabled || !isPanning || !panDofLabt) return;
+                const dx = pointer.x - panDofLabt.x;
+                const dy = pointer.y - panDofLabt.y;
 
-                // 手机端优先“横向拖动看办公室”，纵向手势留给页面滚动看下方面板。
+                // 手机端优先"横向拖动看办公室"，纵向手势留给页面滚动看下方面板。
                 if (isTouchDevice && Math.abs(dy) > Math.abs(dx)) {
                     return;
                 }
 
                 // 手指向右拖，视野跟着向右看：camera scroll 向左减小（反向）
-                const newX = panStart.sx - dx;
+                const newX = panDofLabt.sx - dx;
                 hasManuallyPanned = true;
                 camera.scrollX = clamp(newX, 0, maxScrollX());
 
                 // 桌面端保留自由二维拖动
                 if (!isTouchDevice) {
-                    const newY = panStart.sy - dy;
+                    const newY = panDofLabt.sy - dy;
                     camera.scrollY = clamp(newY, 0, maxScrollY());
                 }
             });
@@ -4548,7 +4554,7 @@ function toggleBrokerPanel() {
             }
 
             // 移动 + 小踱步
-            moveStar(time);
+            moveDofLab(time);
 
             // guest 随机想法泡泡
             maybeShowGuestBubble(time);
@@ -4585,50 +4591,50 @@ function toggleBrokerPanel() {
         }
 
         function applyVisualState(nextState) {
-            // Idle: show Star idle animation (main character)
+            // Idle: show DofLab idle animation (main character)
             if (nextState === 'idle') {
                 sofa.anims.stop();
                 sofa.setTexture('sofa_idle');
 
-                if (window.starWorking) {
-                    window.starWorking.setVisible(false);
-                    window.starWorking.anims.stop();
+                if (window.DofLabWorking) {
+                    window.DofLabWorking.setVisible(false);
+                    window.DofLabWorking.anims.stop();
                 }
 
-                star.setVisible(true);
-                star.setScale(IDLE_STAR_SCALE);
-                star.anims.play('star_idle', true);
-                star.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
+                DofLab.setVisible(true);
+                DofLab.setScale(IDLE_DofLab_SCALE);
+                DofLab.anims.play('DofLab_idle', true);
+                DofLab.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
             } else if (nextState === 'error') {
                 // Error: no working animation at desk
                 sofa.anims.stop();
                 sofa.setTexture('sofa_idle');
-                star.setVisible(false);
-                star.anims.stop();
-                if (window.starWorking) {
-                    window.starWorking.setVisible(false);
-                    window.starWorking.anims.stop();
+                DofLab.setVisible(false);
+                DofLab.anims.stop();
+                if (window.DofLabWorking) {
+                    window.DofLabWorking.setVisible(false);
+                    window.DofLabWorking.anims.stop();
                 }
             } else if (nextState === 'syncing') {
                 // Syncing: also no working animation at desk
                 sofa.anims.stop();
                 sofa.setTexture('sofa_idle');
-                star.setVisible(false);
-                star.anims.stop();
-                if (window.starWorking) {
-                    window.starWorking.setVisible(false);
-                    window.starWorking.anims.stop();
+                DofLab.setVisible(false);
+                DofLab.anims.stop();
+                if (window.DofLabWorking) {
+                    window.DofLabWorking.setVisible(false);
+                    window.DofLabWorking.anims.stop();
                 }
             } else {
-                // Non-idle non-error: starWorking animation at desk
+                // Non-idle non-error: DofLabWorking animation at desk
                 sofa.anims.stop();
                 sofa.setTexture('sofa_idle');
-                // Hide moving star, show desk star
-                star.setVisible(false);
-                star.anims.stop();
-                if (window.starWorking) {
-                    window.starWorking.setVisible(true);
-                    window.starWorking.anims.play('star_working', true);
+                // Hide moving DofLab, show desk DofLab
+                DofLab.setVisible(false);
+                DofLab.anims.stop();
+                if (window.DofLabWorking) {
+                    window.DofLabWorking.setVisible(true);
+                    window.DofLabWorking.anims.play('DofLab_working', true);
                 }
             }
 
@@ -4667,7 +4673,7 @@ function toggleBrokerPanel() {
 
                         const nextState = normalizeState(data.state);
                         const stateInfo = STATES[nextState] || STATES.idle;
-                        // If we're mid-transition, don't restart the path every poll
+                        // If we're mid-transition, don't reDofLabt the path every poll
                         const changed = (pendingDesiredState === null) && (nextState !== currentState);
                         const nextLine = '[' + stateInfo.name + '] ' + (data.detail || '...');
                         // 不论 changed 与否，都按服务端最新状态强制一次视觉同步，避免动画卡旧状态
@@ -4702,7 +4708,7 @@ function toggleBrokerPanel() {
                 });
         }
 
-        function moveStar(time) {
+        function moveDofLab(time) {
             // Use pending state if available (for target area during transition)
             const effectiveState = pendingDesiredState || currentState;
             const stateInfo = STATES[effectiveState] || STATES.idle;
@@ -4710,24 +4716,24 @@ function toggleBrokerPanel() {
 
             // idle 时锁定位置（不走任何移动路径）
             if (effectiveState === 'idle') {
-                if (star && star.visible) {
-                    star.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
+                if (DofLab && DofLab.visible) {
+                    DofLab.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
                 }
                 isMoving = false;
                 return;
             }
 
-            const dx = targetX - star.x;
-            const dy = targetY - star.y;
+            const dx = targetX - DofLab.x;
+            const dy = targetY - DofLab.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
             const speed = 1.4;
             const wobble = Math.sin(time / 200) * 0.8;
 
             if (dist > 3) {
                 // Move toward current target
-                star.x += (dx / dist) * speed;
-                star.y += (dy / dist) * speed;
-                star.setY(star.y + wobble);
+                DofLab.x += (dx / dist) * speed;
+                DofLab.y += (dy / dist) * speed;
+                DofLab.setY(DofLab.y + wobble);
                 isMoving = true;
             } else {
                 // Arrived at a waypoint or final target
@@ -4747,23 +4753,23 @@ function toggleBrokerPanel() {
                             pendingDesiredState = null;
 
                             if (currentState === 'idle') {
-                                if (window.starWorking) {
-                                    window.starWorking.setVisible(false);
-                                    window.starWorking.anims.stop();
+                                if (window.DofLabWorking) {
+                                    window.DofLabWorking.setVisible(false);
+                                    window.DofLabWorking.anims.stop();
                                 }
-                                star.setVisible(true);
-                                star.setScale(IDLE_STAR_SCALE);
-                                star.anims.play('star_idle', true);
-                                star.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
+                                DofLab.setVisible(true);
+                                DofLab.setScale(IDLE_DofLab_SCALE);
+                                DofLab.anims.play('DofLab_idle', true);
+                                DofLab.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
                                 sofa.anims.stop();
                                 sofa.setTexture('sofa_idle');
                             } else {
-                                // Arrived at desk area: switch to star_working animation
-                                star.setVisible(false);
-                                star.anims.stop();
-                                if (window.starWorking) {
-                                    window.starWorking.setVisible(true);
-                                    window.starWorking.anims.play('star_working', true);
+                                // Arrived at desk area: switch to DofLab_working animation
+                                DofLab.setVisible(false);
+                                DofLab.anims.stop();
+                                if (window.DofLabWorking) {
+                                    window.DofLabWorking.setVisible(true);
+                                    window.DofLabWorking.anims.play('DofLab_working', true);
                                 }
                             }
                         }
@@ -4775,23 +4781,23 @@ function toggleBrokerPanel() {
                         pendingDesiredState = null;
 
                         if (currentState === 'idle') {
-                            if (window.starWorking) {
-                                window.starWorking.setVisible(false);
-                                window.starWorking.anims.stop();
+                            if (window.DofLabWorking) {
+                                window.DofLabWorking.setVisible(false);
+                                window.DofLabWorking.anims.stop();
                             }
-                            star.setVisible(true);
-                            star.setScale(IDLE_STAR_SCALE);
-                            star.anims.play('star_idle', true);
-                            star.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
+                            DofLab.setVisible(true);
+                            DofLab.setScale(IDLE_DofLab_SCALE);
+                            DofLab.anims.play('DofLab_idle', true);
+                            DofLab.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
                             sofa.anims.stop();
                             sofa.setTexture('sofa_idle');
                         } else {
-                            // Arrived at desk area: switch to star_working animation
-                            star.setVisible(false);
-                            star.anims.stop();
-                            if (window.starWorking) {
-                                window.starWorking.setVisible(true);
-                                window.starWorking.anims.play('star_working', true);
+                            // Arrived at desk area: switch to DofLab_working animation
+                            DofLab.setVisible(false);
+                            DofLab.anims.stop();
+                            if (window.DofLabWorking) {
+                                window.DofLabWorking.setVisible(true);
+                                window.DofLabWorking.anims.play('DofLab_working', true);
                             }
                             sofa.anims.stop();
                             sofa.setTexture('sofa_idle');
@@ -4806,8 +4812,8 @@ function toggleBrokerPanel() {
             if (!isMoving && currentState !== 'idle' && pendingDesiredState === null && (time - lastWanderAt) > 3500) {
                 targetX = baseTarget.x + (Math.random() - 0.5) * 60;
                 targetY = baseTarget.y + (Math.random() - 0.5) * 40;
-                star.setVisible(true);
-                star.anims.play('star_idle', true);
+                DofLab.setVisible(true);
+                DofLab.anims.play('DofLab_idle', true);
                 isMoving = true;
                 lastWanderAt = time;
             }
@@ -4827,19 +4833,19 @@ function toggleBrokerPanel() {
             // Bubble anchor should follow current visible character:
             // - syncing: syncAnimSprite
             // - error state: errorBug
-            // - working at desk: starWorking
-            // - other: star
-            let anchorX = star.x;
-            let anchorY = star.y;
+            // - working at desk: DofLabWorking
+            // - other: DofLab
+            let anchorX = DofLab.x;
+            let anchorY = DofLab.y;
             if (currentState === 'syncing' && syncAnimSprite && syncAnimSprite.visible) {
                 anchorX = syncAnimSprite.x;
                 anchorY = syncAnimSprite.y;
             } else if (currentState === 'error' && window.errorBug && window.errorBug.visible) {
                 anchorX = window.errorBug.x;
                 anchorY = window.errorBug.y;
-            } else if (!star.visible && window.starWorking && window.starWorking.visible) {
-                anchorX = window.starWorking.x;
-                anchorY = window.starWorking.y;
+            } else if (!DofLab.visible && window.DofLabWorking && window.DofLabWorking.visible) {
+                anchorX = window.DofLabWorking.x;
+                anchorY = window.DofLabWorking.y;
             }
 
             const text = texts[Math.floor(Math.random() * texts.length)];
@@ -4853,7 +4859,7 @@ function toggleBrokerPanel() {
             bg.setStrokeStyle(2, 0x000000);
             const txt = game.add.text(anchorX, bubbleY, text, { fontFamily: 'ArkPixel, monospace', fontSize: fontSize + 'px', fill: '#000', align: 'center' }).setOrigin(0.5);
             bubble = game.add.container(0, 0, [bg, txt]);
-            bubble.setDepth(1200); // always above desk/star
+            bubble.setDepth(1200); // always above desk/DofLab
             setTimeout(() => { if (bubble) { bubble.destroy(); bubble = null; } }, 3000);
         }
 
@@ -4879,3 +4885,4 @@ function toggleBrokerPanel() {
     </script>
 </body>
 </html>
+

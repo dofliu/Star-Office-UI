@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://127.0.0.1:19000/health)",
+      "Bash(STAR_OFFICE_URL=\"http://127.0.0.1:19000\" STAR_OFFICE_JOIN_KEY=\"ocj_example_team_01\" python scripts/ai-office-bridge.py claude-code writing \"正在寫程式\")",
+      "Bash(curl -s http://127.0.0.1:19000/agents)",
+      "Bash(STAR_OFFICE_URL=\"http://127.0.0.1:19000\" STAR_OFFICE_JOIN_KEY=\"ocj_example_team_01\" python scripts/ai-office-bridge.py claude-code researching \"閱讀專案文件中\")",
+      "Bash(STAR_OFFICE_URL=\"http://127.0.0.1:19000\" STAR_OFFICE_JOIN_KEY=\"ocj_example_team_01\" python scripts/ai-office-bridge.py claude-code executing \"$ npm run build\")",
+      "Bash(STAR_OFFICE_URL=\"http://127.0.0.1:19000\" STAR_OFFICE_JOIN_KEY=\"ocj_example_team_01\" python scripts/ai-office-bridge.py claude-code idle)",
+      "Bash(python -m json.tool)",
+      "Bash(python -c \"import sys; print\\(sys.executable\\)\")",
+      "Bash(STAR_OFFICE_URL=\"http://127.0.0.1:19000\" STAR_OFFICE_JOIN_KEY=\"ocj_example_team_01\" python scripts/ai-office-bridge.py claude-code writing \"正在和主人對話中\")"
+    ]
+  }
+}
