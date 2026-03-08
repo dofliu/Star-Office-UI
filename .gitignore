@@ -41,6 +41,6 @@ join-keys.json
 # Claw Office UI v2
 data/
 frontend-vue/node_modules/
-frontend-vue/dist/
+# frontend-vue/dist/ — included in git for easy deployment
 .claw-office-bridge/
 *.db
