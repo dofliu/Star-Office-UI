@@ -149,6 +149,55 @@
         }
         @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+
+        /* History Timeline Panel */
+        .history-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 9997;
+            justify-content: center; align-items: center;
+        }
+        .history-overlay.active { display: flex; }
+        .history-panel {
+            background: #1a1a2e; border: 2px solid #7f5af0;
+            border-radius: 12px; padding: 24px; width: 560px; max-width: 90vw;
+            max-height: 80vh; color: #fffffe; display: flex; flex-direction: column;
+        }
+        .history-panel h2 { font-size: 18px; margin-bottom: 8px; color: #7f5af0; }
+        .history-controls { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+        .history-controls select, .history-controls button {
+            padding: 6px 12px; font-size: 12px; font-family: inherit;
+            background: #16161a; border: 1px solid #2e2e4a; border-radius: 6px;
+            color: #fffffe; cursor: pointer;
+        }
+        .history-controls button:hover { background: #2e2e4a; }
+        .history-summary {
+            background: #16161a; border-radius: 8px; padding: 12px;
+            margin-bottom: 12px; font-size: 12px;
+        }
+        .history-summary .stat { display: inline-block; margin-right: 16px; }
+        .history-summary .stat-label { color: #94a1b2; }
+        .history-summary .stat-value { color: #2cb67d; font-weight: bold; }
+        .history-timeline {
+            flex: 1; overflow-y: auto; max-height: 400px;
+        }
+        .timeline-entry {
+            display: flex; gap: 12px; padding: 8px 0;
+            border-bottom: 1px solid #2e2e4a; font-size: 12px;
+        }
+        .timeline-time { color: #94a1b2; min-width: 70px; flex-shrink: 0; }
+        .timeline-state {
+            min-width: 80px; flex-shrink: 0; text-transform: uppercase;
+            font-weight: bold; font-size: 11px;
+        }
+        .timeline-arrow { color: #555; flex-shrink: 0; }
+        .timeline-msg { color: #fffffe; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .history-close {
+            margin-top: 16px; padding: 8px 20px; border: none; border-radius: 6px;
+            background: #2e2e4a; color: #94a1b2; font-family: inherit; cursor: pointer;
+            font-size: 14px; float: right;
+        }
+        .history-close:hover { background: #3e3e5a; }
     </style>
 </head>
 <body>
@@ -172,6 +221,26 @@
             <h2 id="detail-title">Agent Details</h2>
             <div id="detail-content"></div>
             <button class="detail-close" onclick="closeDetail()">關閉</button>
+        </div>
+    </div>
+
+    <!-- History Timeline Panel -->
+    <div class="history-overlay" id="history-panel" onclick="if(event.target===this)closeHistory()">
+        <div class="history-panel">
+            <h2 id="history-title">📜 歷史紀錄</h2>
+            <div class="history-controls">
+                <select id="history-hours" onchange="refreshHistory()">
+                    <option value="1">最近 1 小時</option>
+                    <option value="6">最近 6 小時</option>
+                    <option value="24" selected>最近 24 小時</option>
+                    <option value="72">最近 3 天</option>
+                    <option value="168">最近 7 天</option>
+                </select>
+                <button onclick="refreshHistory()">🔄 重新整理</button>
+            </div>
+            <div class="history-summary" id="history-summary"></div>
+            <div class="history-timeline" id="history-timeline"></div>
+            <button class="history-close" onclick="closeHistory()">關閉</button>
         </div>
     </div>
 
@@ -275,6 +344,7 @@
         html += `<div class="detail-row"><span class="detail-label">TTL</span><span class="detail-value">${agent.ttl}s</span></div>`;
         html += `<div class="detail-row"><span class="detail-label">最後更新</span><span class="detail-value">${updated}</span></div>`;
         html += `<div class="detail-row"><span class="detail-label">建立時間</span><span class="detail-value">${created}</span></div>`;
+        html += `<div style="margin-top:12px"><button onclick="closeDetail();openHistory('${agent.id}')" style="padding:6px 16px;border:1px solid #7f5af0;border-radius:6px;background:transparent;color:#7f5af0;font-family:inherit;font-size:12px;cursor:pointer">📜 查看歷史紀錄</button></div>`;
 
         document.getElementById('detail-content').innerHTML = html;
         document.getElementById('detail-panel').classList.add('active');
@@ -328,6 +398,82 @@
         toast.textContent = message;
         container.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
+    }
+
+    // --- History Timeline Logic ---
+    let historyAgentId = null;
+
+    async function openHistory(agentId) {
+        historyAgentId = agentId;
+        document.getElementById('history-title').textContent = `📜 ${agentId} 歷史紀錄`;
+        document.getElementById('history-panel').classList.add('active');
+        await refreshHistory();
+    }
+
+    function closeHistory() {
+        document.getElementById('history-panel').classList.remove('active');
+        historyAgentId = null;
+    }
+
+    async function refreshHistory() {
+        if (!historyAgentId) return;
+        const hours = document.getElementById('history-hours').value;
+
+        try {
+            // Fetch history and summary in parallel
+            const [histRes, sumRes] = await Promise.all([
+                fetch(`/agents/${historyAgentId}/history?hours=${hours}&limit=200`),
+                fetch(`/agents/${historyAgentId}/summary?hours=${hours}`)
+            ]);
+            const histData = await histRes.json();
+            const sumData = await sumRes.json();
+
+            // Render summary
+            const summaryEl = document.getElementById('history-summary');
+            if (sumData.total_entries === 0) {
+                summaryEl.innerHTML = '<span style="color:#94a1b2">此時段無紀錄</span>';
+            } else {
+                let stateCounts = Object.entries(sumData.state_counts || {})
+                    .map(([s, c]) => `<span class="stat"><span class="stat-label">${s}:</span> <span class="stat-value">${c}</span></span>`)
+                    .join('');
+                summaryEl.innerHTML = `<span class="stat"><span class="stat-label">紀錄數:</span> <span class="stat-value">${sumData.total_entries}</span></span> ${stateCounts}`;
+            }
+
+            // Render timeline
+            const stateColorMap = {
+                idle: '#94a1b2', writing: '#7f5af0', researching: '#72f1d4',
+                executing: '#2cb67d', syncing: '#f9a825', error: '#ff6b6b',
+            };
+            const stateIconMap = {
+                idle: '💤', writing: '✍️', researching: '🔍',
+                executing: '⚡', syncing: '🔄', error: '🐛',
+            };
+            const timelineEl = document.getElementById('history-timeline');
+            const entries = histData.entries || [];
+            if (entries.length === 0) {
+                timelineEl.innerHTML = '<div style="color:#94a1b2;text-align:center;padding:20px">此時段無歷史紀錄</div>';
+            } else {
+                timelineEl.innerHTML = entries.map(e => {
+                    const t = new Date(e.timestamp * 1000);
+                    const timeStr = t.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+                    const dateStr = t.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' });
+                    const color = stateColorMap[e.state] || '#94a1b2';
+                    const icon = stateIconMap[e.state] || '❓';
+                    const arrow = e.prev_state ? `<span class="timeline-arrow">${e.prev_state} →</span>` : '';
+                    const msg = e.message ? e.message : '';
+                    return `<div class="timeline-entry">
+                        <span class="timeline-time">${dateStr} ${timeStr}</span>
+                        ${arrow}
+                        <span class="timeline-state" style="color:${color}">${icon} ${e.state}</span>
+                        <span class="timeline-msg">${msg}</span>
+                    </div>`;
+                }).join('');
+            }
+        } catch (err) {
+            console.error('Failed to load history:', err);
+            document.getElementById('history-timeline').innerHTML =
+                '<div style="color:#ff6b6b;text-align:center;padding:20px">載入失敗</div>';
+        }
     }
 
     async function saveSettings() {
