@@ -39,9 +39,10 @@ class Office:
             raise KeyError(f"Agent '{agent_id}' not found")
         return self.agents[agent_id]
 
-    def set_state(self, agent_id: str, state: str, message: str = "") -> Agent:
+    def set_state(self, agent_id: str, state: str, message: str = "",
+                  progress: int = 0) -> Agent:
         agent = self.get_agent(agent_id)
-        agent.set_state(state, message)
+        agent.set_state(state, message, progress)
         self.save()
         return agent
 

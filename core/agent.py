@@ -21,6 +21,7 @@ class Agent:
         self.avatar = ""         # avatar key or image path
         self.state = "idle"
         self.message = ""
+        self.progress = 0        # 0-100 progress percentage
         self.ttl = ttl
         self.last_updated = time.time()
         self.created_at = time.time()
@@ -30,11 +31,12 @@ class Agent:
         """Display name shown in UI — uses display_name if set, else name."""
         return self.display_name or self.name
 
-    def set_state(self, state: str, message: str = "") -> None:
+    def set_state(self, state: str, message: str = "", progress: int = 0) -> None:
         if state not in VALID_STATES:
             raise ValueError(f"Invalid state '{state}'. Must be one of: {sorted(VALID_STATES)}")
         self.state = state
         self.message = message
+        self.progress = max(0, min(100, progress))
         self.last_updated = time.time()
 
     def check_ttl(self) -> bool:
@@ -45,6 +47,7 @@ class Agent:
             if elapsed >= self.ttl:
                 self.state = "idle"
                 self.message = ""
+                self.progress = 0
                 self.last_updated = time.time()
                 return True
         return False
@@ -58,6 +61,7 @@ class Agent:
             "avatar": self.avatar,
             "state": self.state,
             "message": self.message,
+            "progress": self.progress,
             "ttl": self.ttl,
             "last_updated": self.last_updated,
             "created_at": self.created_at,
@@ -70,6 +74,7 @@ class Agent:
         agent.avatar = data.get("avatar", "")
         agent.state = data.get("state", "idle")
         agent.message = data.get("message", "")
+        agent.progress = data.get("progress", 0)
         agent.last_updated = data.get("last_updated", time.time())
         agent.created_at = data.get("created_at", time.time())
         return agent
