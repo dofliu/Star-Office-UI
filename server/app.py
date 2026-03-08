@@ -10,10 +10,12 @@ from flask import Flask, jsonify, request, send_from_directory
 from core.office import Office
 from core.agent import VALID_STATES, DEFAULT_AVATARS
 from core.history import HistoryLogger
+from core.scenes import SceneManager, BUILTIN_SCENES
 
 PORT = int(os.environ.get("STAR_OFFICE_PORT", 19200))
 STORE_PATH = os.environ.get("STAR_OFFICE_STORE", "office-state.json")
 LOG_DIR = os.environ.get("STAR_OFFICE_LOG_DIR", "logs")
+SCENE_CONFIG = os.environ.get("STAR_OFFICE_SCENE_CONFIG", "scene-config.json")
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend-v2")
 
 app = Flask(__name__, static_folder=FRONTEND_DIR)
@@ -21,6 +23,10 @@ app = Flask(__name__, static_folder=FRONTEND_DIR)
 
 def get_office():
     return Office(STORE_PATH, LOG_DIR)
+
+
+def get_scene_manager():
+    return SceneManager(SCENE_CONFIG)
 
 
 # --- Health ---
@@ -158,8 +164,105 @@ def cleanup_history():
     max_age_days = data.get("max_age_days", 30)
     max_age_days = max(1, min(max_age_days, 365))
     logger = HistoryLogger(LOG_DIR)
-    removed = logger.cleanup(max_age_days)
-    return jsonify({"removed_entries": removed, "max_age_days": max_age_days})
+    result = logger.auto_cleanup(max_age_days)
+    return jsonify(result)
+
+
+# --- Daily Summary ---
+
+@app.route("/agents/<agent_id>/daily-summary", methods=["GET"])
+def get_daily_summary(agent_id):
+    date_str = request.args.get("date", "")
+    logger = HistoryLogger(LOG_DIR)
+    summary = logger.generate_daily_summary(agent_id, date_str)
+    if "error" in summary:
+        return jsonify(summary), 400
+    return jsonify(summary)
+
+
+@app.route("/daily-summary", methods=["GET"])
+def get_all_daily_summaries():
+    date_str = request.args.get("date", "")
+    logger = HistoryLogger(LOG_DIR)
+    summaries = logger.generate_all_daily_summaries(date_str)
+    return jsonify({"date": date_str, "summaries": summaries})
+
+
+# --- Scenes & Themes ---
+
+@app.route("/scenes", methods=["GET"])
+def list_scenes():
+    sm = get_scene_manager()
+    return jsonify({
+        "scenes": sm.list_scenes(),
+        "current": sm.config.get("current_scene", "default_office"),
+    })
+
+
+@app.route("/scenes/current", methods=["GET"])
+def get_current_scene():
+    sm = get_scene_manager()
+    scene = sm.get_current_scene()
+    return jsonify(scene)
+
+
+@app.route("/scenes/current", methods=["POST"])
+def set_current_scene():
+    data = request.get_json(silent=True) or {}
+    scene_id = data.get("scene_id")
+    if not scene_id:
+        return jsonify({"error": "Missing 'scene_id'"}), 400
+    sm = get_scene_manager()
+    try:
+        scene = sm.set_scene(scene_id)
+        return jsonify(scene)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+
+# --- Theme (Dark/Light mode) ---
+
+@app.route("/theme", methods=["GET"])
+def get_theme():
+    sm = get_scene_manager()
+    return jsonify({
+        "dark_mode": sm.is_dark_mode(),
+        "scene": sm.get_current_scene(),
+    })
+
+
+@app.route("/theme", methods=["POST"])
+def set_theme():
+    data = request.get_json(silent=True) or {}
+    dark_mode = data.get("dark_mode")
+    if dark_mode is None:
+        return jsonify({"error": "Missing 'dark_mode' (boolean)"}), 400
+    sm = get_scene_manager()
+    scene = sm.set_dark_mode(bool(dark_mode))
+    return jsonify({"dark_mode": sm.is_dark_mode(), "scene": scene})
+
+
+# --- Canvas Resolution ---
+
+@app.route("/resolution", methods=["GET"])
+def get_resolution():
+    sm = get_scene_manager()
+    return jsonify(sm.get_resolution())
+
+
+@app.route("/resolution", methods=["POST"])
+def set_resolution():
+    data = request.get_json(silent=True) or {}
+    width = data.get("width")
+    height = data.get("height")
+    if width is None or height is None:
+        return jsonify({"error": "Missing 'width' and 'height'"}), 400
+    try:
+        sm = get_scene_manager()
+        result = sm.set_resolution(int(width), int(height))
+        return jsonify(result)
+    except (ValueError, TypeError):
+        return jsonify({"error": "width and height must be integers"}), 400
 
 
 # --- Frontend ---

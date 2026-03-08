@@ -1,6 +1,6 @@
 # CLAUDE.md — Star Office UI
 
-> 最後更新：2026-03-08
+> 最後更新：2026-03-08 (Phase 6 completed)
 > 本文件是給 AI 開發者（Claude Code、Gemini CLI 等）的完整專案說明，確保跨 session 能無縫接續開發。
 
 ---
@@ -29,7 +29,7 @@ Star Office UI 是一個**像素風格的 AI 辦公室儀表板**，在瀏覽器
 - `server/app.py` — 輕量 Flask REST API
 - `frontend-v2/` — Phaser 3 程序化像素渲染（無需外部素材）
 - `cli/` — 命令列工具
-- `tests/` — 完整測試覆蓋（72+ tests）
+- `tests/` — 完整測試覆蓋（117+ tests）
 
 **⚠ 新功能請在 V2 架構上開發，V1 僅做維護。**
 
@@ -39,7 +39,7 @@ Star Office UI 是一個**像素風格的 AI 辦公室儀表板**，在瀏覽器
 
 | 層級 | 技術 | 檔案 |
 |------|------|------|
-| 核心引擎 | Python 3.10+ | `core/agent.py`, `core/office.py`, `core/store.py` |
+| 核心引擎 | Python 3.10+ | `core/agent.py`, `core/office.py`, `core/store.py`, `core/history.py`, `core/scenes.py` |
 | API 伺服器 | Flask 3.0+ (port 19200) | `server/app.py` |
 | 前端 | Phaser 3.60 (Canvas) | `frontend-v2/index.html`, `frontend-v2/office-scene.js` |
 | CLI | Python argparse | `cli/main.py` |
@@ -55,7 +55,9 @@ Star-Office-UI/
 ├── core/                    # ⭐ V2 核心引擎
 │   ├── agent.py             # Agent 類：狀態機 + TTL + display_name + avatar
 │   ├── office.py            # Office 管理：多代理人 + JSON 持久化
-│   └── store.py             # JSON 讀寫工具
+│   ├── store.py             # JSON 讀寫工具
+│   ├── history.py           # JSONL 歷史紀錄 + 每日摘要 + 日誌清理
+│   └── scenes.py            # 場景/主題系統（5 種內建場景 + 深淺模式）
 │
 ├── server/                  # ⭐ V2 Flask API (port 19200)
 │   └── app.py               # REST 端點 + 前端靜態檔案服務
@@ -68,7 +70,7 @@ Star-Office-UI/
 ├── cli/                     # ⭐ V2 命令列工具
 │   └── main.py              # star-office add/remove/set/list/status/reset
 │
-├── tests/                   # ⭐ 測試套件 (72+ tests)
+├── tests/                   # ⭐ 測試套件 (117+ tests)
 │   ├── test_agent.py        # Agent 模型測試
 │   ├── test_office.py       # Office 管理測試
 │   ├── test_server.py       # API 端點測試（含 profile/avatar）
@@ -154,6 +156,25 @@ cd backend && python3 app.py
 | POST | `/agents/<id>/profile` | 更新暱稱/頭像 | `{"display_name?", "avatar?"}` |
 | GET | `/avatars` | 列出可用頭像 | — |
 
+### 場景與主題（Phase 6）
+
+| 方法 | 路徑 | 用途 | 請求 Body |
+|------|------|------|-----------|
+| GET | `/scenes` | 列出可用場景 + 目前場景 | — |
+| GET | `/scenes/current` | 取得當前場景（含色彩、區域） | — |
+| POST | `/scenes/current` | 切換場景 | `{"scene_id"}` |
+| GET | `/theme` | 取得深淺模式狀態 | — |
+| POST | `/theme` | 切換深色/淺色模式 | `{"dark_mode": bool}` |
+| GET | `/resolution` | 取得畫布解析度 | — |
+| POST | `/resolution` | 設定畫布解析度 | `{"width", "height"}` |
+
+### 每日摘要（Phase 6）
+
+| 方法 | 路徑 | 用途 | 參數 |
+|------|------|------|------|
+| GET | `/agents/<id>/daily-summary` | 單一 agent 每日摘要 | `?date=YYYY-MM-DD` |
+| GET | `/daily-summary` | 所有 agent 每日摘要 | `?date=YYYY-MM-DD` |
+
 ### 系統
 
 | 方法 | 路徑 | 用途 |
@@ -225,6 +246,13 @@ Agent:
 - **中間**：工作區 — writing/researching/executing/syncing
 - **右側**：Debug Corner — error 狀態
 
+### 場景系統（Phase 6）
+- **右下角控制列**：場景選擇 + 深淺模式切換 + 解析度設定
+- **5 種內建場景**：辦公室（預設）、咖啡廳、太空站、花園、圖書館
+- 每個場景有獨立的色彩方案和區域標籤
+- 深色/淺色模式會覆蓋背景色但保留場景主題色
+- 解析度支援 640×360 到 1920×1080
+
 ---
 
 ## 已完成的開發階段
@@ -250,35 +278,44 @@ Agent:
 - 即時狀態輪詢 + 區域自動分配
 - 新增 8 Profile/Avatar 測試
 
+### Phase 4 ✅ 進階 UI 增強
+- 進度條顯示（`progress` 欄位）
+- 點擊 agent card 彈出詳情面板（detail panel）
+- agent 列表側邊欄（可摺疊）
+- 狀態變化 toast 通知
+- 縮放控制（zoom in/out）
+
+### Phase 5 ✅ 歷史紀錄
+- 狀態歷史 API（`GET /agents/<id>/history`）
+- JSONL 日誌持久化（`logs/` 目錄）
+- 歷史時間軸 UI
+- 工作摘要 API（`GET /agents/<id>/summary`）
+- 日誌清理 API（`POST /history/cleanup`）
+
+### Phase 6 ✅ 場景與主題
+- 5 種內建場景套裝（辦公室、咖啡廳、太空站、花園、圖書館）
+- 場景切換 API + 前端 UI 選擇器
+- 深色/淺色模式切換（保留場景主題色）
+- 畫布解析度可調（640×360 ~ 1920×1080）
+- 每日工作摘要自動產生（`GET /agents/<id>/daily-summary`）
+- 增強日誌清理（含詳細報告）
+- 53 新測試（場景/主題/解析度/摘要）
+
 ---
 
 ## 下一步開發計畫
-
-### Phase 4（下一個）— 進階 UI 增強
-- [ ] 進度條顯示（`progress` 欄位）
-- [ ] 點擊 agent card 彈出詳情面板（detail panel）
-- [ ] agent 列表側邊欄（可摺疊）
-- [ ] 狀態變化 toast 通知
-- [ ] 縮放控制（zoom in/out）
-
-### Phase 5 — 歷史紀錄
-- [ ] 狀態歷史 API（`GET /agents/<id>/history`）
-- [ ] JSONL 日誌持久化（`agent-logs/` 目錄）
-- [ ] 歷史時間軸 UI
-- [ ] 每日工作摘要自動產生
-- [ ] 日誌清理策略
-
-### Phase 6 — 場景與主題
-- [ ] 多場景套裝系統（辦公室、咖啡廳、太空站等）
-- [ ] 畫布解析度可調
-- [ ] 深色/淺色模式
-- [ ] 自訂角色上傳（sprite sheet）
 
 ### Phase 7 — OpenClaw 整合
 - [ ] OpenClaw 連線設定
 - [ ] 從 UI 派發任務給 AI 代理人
 - [ ] 任務佇列面板
 - [ ] 代理人群組管理
+
+### Phase 8 — 進階功能
+- [ ] WebSocket 升級（取代輪詢）
+- [ ] 自訂角色上傳（sprite sheet）
+- [ ] 雙向訊息通道
+- [ ] 歷史搜尋功能
 
 ---
 
@@ -359,6 +396,7 @@ python3 scripts/ai-office-bridge.py claude-code writing "正在編輯程式碼"
 |------|------|------|
 | `pyproject.toml` | Python 專案設定 | ✅ |
 | `office-state.json` | V2 agent 狀態持久化 | ❌ 自動產生 |
+| `scene-config.json` | 場景/主題/解析度設定 | ❌ 自動產生 |
 | `.env` | 環境變數 | ❌ 參考 `.env.example` |
 | `state.json` | V1 主代理狀態 | ❌ |
 | `join-keys.json` | 訪客加入金鑰 | ❌ |
@@ -381,7 +419,7 @@ python3 scripts/ai-office-bridge.py claude-code writing "正在編輯程式碼"
 ## 不要做的事
 
 - 不要修改 `assets/` 下的美術素材檔案（非商業授權）
-- 不要將 `.env`、`state.json`、`join-keys.json`、`runtime-config.json`、`agents-state.json`、`office-state.json` 加入版控
+- 不要將 `.env`、`state.json`、`join-keys.json`、`runtime-config.json`、`agents-state.json`、`office-state.json`、`scene-config.json` 加入版控
 - 不要在前端引入額外的打包工具或框架（保持原生 JS + Phaser）
 - 不要把 V2 的 port 改回 19000（會與舊版衝突）
 - 不要在 V1 backend/app.py 上開發新功能（新功能走 V2）

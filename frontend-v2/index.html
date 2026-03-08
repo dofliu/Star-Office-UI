@@ -150,6 +150,45 @@
         @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
 
+        /* Scene/Theme Controls */
+        #scene-controls {
+            position: fixed; bottom: 12px; right: 12px; z-index: 9991;
+            display: flex; gap: 8px; align-items: center;
+        }
+        #scene-controls select, #scene-controls button {
+            padding: 6px 12px; font-size: 11px; font-family: inherit;
+            background: #1a1a2e; border: 1px solid #2e2e4a; border-radius: 6px;
+            color: #fffffe; cursor: pointer;
+        }
+        #scene-controls select:hover, #scene-controls button:hover {
+            background: #2e2e4a;
+        }
+        .theme-toggle { font-size: 16px !important; padding: 4px 8px !important; }
+
+        /* Resolution Modal */
+        .resolution-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 9999;
+            justify-content: center; align-items: center;
+        }
+        .resolution-overlay.active { display: flex; }
+        .resolution-panel {
+            background: #1a1a2e; border: 2px solid #7f5af0;
+            border-radius: 12px; padding: 24px; width: 360px; max-width: 90vw;
+            color: #fffffe;
+        }
+        .resolution-panel h2 { font-size: 18px; margin-bottom: 16px; color: #7f5af0; }
+        .res-option {
+            display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+            margin-bottom: 6px; border-radius: 6px; cursor: pointer;
+            background: #16161a; transition: background 0.2s;
+        }
+        .res-option:hover { background: #2e2e4a; }
+        .res-option.selected { border: 2px solid #7f5af0; }
+        .res-option-label { font-size: 13px; }
+        .res-option-desc { font-size: 10px; color: #94a1b2; }
+
         /* History Timeline Panel */
         .history-overlay {
             display: none;
@@ -205,6 +244,24 @@
 
     <!-- Toast Notifications -->
     <div id="toast-container"></div>
+
+    <!-- Scene/Theme Controls (bottom-right) -->
+    <div id="scene-controls">
+        <select id="scene-select" onchange="changeScene(this.value)"></select>
+        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="深色/淺色模式切換">🌙</button>
+        <button onclick="openResolution()" title="解析度設定">📐</button>
+    </div>
+
+    <!-- Resolution Settings Modal -->
+    <div class="resolution-overlay" id="resolution-modal" onclick="if(event.target===this)closeResolution()">
+        <div class="resolution-panel">
+            <h2>📐 解析度設定</h2>
+            <div id="resolution-options"></div>
+            <div class="modal-buttons" style="margin-top:16px">
+                <button class="btn-cancel" onclick="closeResolution()">關閉</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Sidebar Toggle -->
     <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
@@ -475,6 +532,111 @@
                 '<div style="color:#ff6b6b;text-align:center;padding:20px">載入失敗</div>';
         }
     }
+
+    // --- Scene/Theme/Resolution Logic ---
+    let isDarkMode = true;
+
+    async function loadSceneList() {
+        try {
+            const res = await fetch('/scenes');
+            if (!res.ok) return;
+            const data = await res.json();
+            const select = document.getElementById('scene-select');
+            select.innerHTML = '';
+            (data.scenes || []).forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.name;
+                if (s.id === data.current) opt.selected = true;
+                select.appendChild(opt);
+            });
+        } catch (e) { console.warn('Failed to load scenes:', e); }
+    }
+
+    async function loadThemeState() {
+        try {
+            const res = await fetch('/theme');
+            if (!res.ok) return;
+            const data = await res.json();
+            isDarkMode = data.dark_mode;
+            document.getElementById('theme-toggle').textContent = isDarkMode ? '🌙' : '☀️';
+        } catch (e) { console.warn('Failed to load theme:', e); }
+    }
+
+    async function changeScene(sceneId) {
+        try {
+            const res = await fetch('/scenes/current', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ scene_id: sceneId })
+            });
+            if (res.ok) {
+                showToast('場景已切換');
+                // Reload the page to apply new scene
+                setTimeout(() => location.reload(), 500);
+            }
+        } catch (e) { console.error('Failed to change scene:', e); }
+    }
+
+    async function toggleTheme() {
+        isDarkMode = !isDarkMode;
+        try {
+            const res = await fetch('/theme', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dark_mode: isDarkMode })
+            });
+            if (res.ok) {
+                document.getElementById('theme-toggle').textContent = isDarkMode ? '🌙' : '☀️';
+                showToast(isDarkMode ? '深色模式' : '淺色模式');
+                setTimeout(() => location.reload(), 500);
+            }
+        } catch (e) { console.error('Failed to toggle theme:', e); }
+    }
+
+    const RESOLUTIONS = [
+        { w: 640, h: 360, label: '640×360', desc: '小型' },
+        { w: 800, h: 450, label: '800×450', desc: '緊湊' },
+        { w: 960, h: 540, label: '960×540', desc: '預設' },
+        { w: 1280, h: 720, label: '1280×720', desc: 'HD' },
+        { w: 1920, h: 1080, label: '1920×1080', desc: 'Full HD' },
+    ];
+
+    function openResolution() {
+        const container = document.getElementById('resolution-options');
+        container.innerHTML = '';
+        RESOLUTIONS.forEach(r => {
+            const div = document.createElement('div');
+            div.className = 'res-option';
+            div.innerHTML = `<span class="res-option-label">${r.label}</span><span class="res-option-desc">${r.desc}</span>`;
+            div.onclick = () => setResolution(r.w, r.h);
+            container.appendChild(div);
+        });
+        document.getElementById('resolution-modal').classList.add('active');
+    }
+
+    function closeResolution() {
+        document.getElementById('resolution-modal').classList.remove('active');
+    }
+
+    async function setResolution(w, h) {
+        try {
+            const res = await fetch('/resolution', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ width: w, height: h })
+            });
+            if (res.ok) {
+                closeResolution();
+                showToast(`解析度已設定: ${w}×${h}`);
+                setTimeout(() => location.reload(), 500);
+            }
+        } catch (e) { console.error('Failed to set resolution:', e); }
+    }
+
+    // Initialize scene controls on page load
+    loadSceneList();
+    loadThemeState();
 
     async function saveSettings() {
         if (!settingsAgentId) return;

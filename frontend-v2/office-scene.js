@@ -3,8 +3,8 @@
  * Renders AI agents in a 2D pixel office with real-time status polling.
  */
 
-// --- Color palette ---
-const COLORS = {
+// --- Color palette (default, overridden by scene) ---
+let COLORS = {
     bg:        0x0f0e17,
     panel:     0x1a1a2e,
     border:    0x2e2e4a,
@@ -17,6 +17,10 @@ const COLORS = {
     textDim:   0x94a1b2,
     yellow:    0xffd700,
 };
+
+// Current scene data (loaded from API)
+let currentScene = null;
+let currentZoneLabels = null;
 
 // State → color mapping
 const STATE_COLORS = {
@@ -50,8 +54,8 @@ const AVATAR_COLORS = {
     char_yellow: 0xffd700,
 };
 
-const CANVAS_W = 960;
-const CANVAS_H = 540;
+let CANVAS_W = 960;
+let CANVAS_H = 540;
 const POLL_INTERVAL = 3000; // ms
 const AGENT_CARD_W = 200;
 const AGENT_CARD_H = 180;
@@ -69,25 +73,30 @@ class OfficeScene extends Phaser.Scene {
         // We draw everything procedurally — no external assets needed for v2
     }
 
-    create() {
+    async create() {
         window.starOfficeScene = this;
         this.currentZoom = 1.0;
+
+        // Load scene config from API
+        await this.loadSceneConfig();
 
         // Background: dark gradient feel with pixel grid
         this.drawBackground();
 
         // Title bar
-        this.add.text(CANVAS_W / 2, 18, '⭐ STAR OFFICE', {
+        const accentHex = '#' + (COLORS.accent).toString(16).padStart(6, '0');
+        this.titleText = this.add.text(CANVAS_W / 2, 18, '⭐ STAR OFFICE', {
             fontSize: '20px',
             fontFamily: "'ArkPixel', 'Courier New', monospace",
-            color: '#7f5af0',
+            color: accentHex,
         }).setOrigin(0.5, 0);
 
         // Subtitle
+        const dimHex = '#' + (COLORS.textDim).toString(16).padStart(6, '0');
         this.statusText = this.add.text(CANVAS_W / 2, 42, 'Connecting...', {
             fontSize: '12px',
             fontFamily: "'ArkPixel', 'Courier New', monospace",
-            color: '#94a1b2',
+            color: dimHex,
         }).setOrigin(0.5, 0);
 
         // Office floor area
@@ -108,13 +117,38 @@ class OfficeScene extends Phaser.Scene {
         this.drawZoomControls();
     }
 
+    async loadSceneConfig() {
+        try {
+            const res = await fetch('/scenes/current');
+            if (res.ok) {
+                currentScene = await res.json();
+                if (currentScene && currentScene.colors) {
+                    // Apply scene colors
+                    COLORS.bg = currentScene.colors.bg || COLORS.bg;
+                    COLORS.panel = currentScene.colors.panel || COLORS.panel;
+                    COLORS.border = currentScene.colors.border || COLORS.border;
+                    COLORS.accent = currentScene.colors.accent || COLORS.accent;
+                    COLORS.text = currentScene.colors.text || COLORS.text;
+                    COLORS.textDim = currentScene.colors.textDim || COLORS.textDim;
+                }
+                if (currentScene && currentScene.zones) {
+                    currentZoneLabels = currentScene.zones;
+                }
+            }
+        } catch (e) {
+            console.warn('Could not load scene config, using defaults:', e);
+        }
+    }
+
     drawBackground() {
         // Main bg
         this.add.rectangle(CANVAS_W / 2, CANVAS_H / 2, CANVAS_W, CANVAS_H, COLORS.bg);
 
         // Subtle pixel grid
+        const gridColor = (currentScene && currentScene.colors && currentScene.colors.grid)
+            ? currentScene.colors.grid : 0x1a1a2e;
         const gfx = this.add.graphics();
-        gfx.lineStyle(1, 0x1a1a2e, 0.3);
+        gfx.lineStyle(1, gridColor, 0.3);
         for (let x = 0; x < CANVAS_W; x += 32) {
             gfx.moveTo(x, 0);
             gfx.lineTo(x, CANVAS_H);
@@ -130,23 +164,32 @@ class OfficeScene extends Phaser.Scene {
         // Floor area
         const floorY = 64;
         const floorH = CANVAS_H - floorY - 10;
+        const floorColor = (currentScene && currentScene.colors && currentScene.colors.floor)
+            ? currentScene.colors.floor : 0x16161a;
         const gfx = this.add.graphics();
-        gfx.fillStyle(0x16161a, 0.6);
+        gfx.fillStyle(floorColor, 0.6);
         gfx.fillRoundedRect(12, floorY, CANVAS_W - 24, floorH, 8);
         gfx.lineStyle(1, COLORS.border, 0.5);
         gfx.strokeRoundedRect(12, floorY, CANVAS_W - 24, floorH, 8);
 
-        // Zone labels
+        // Zone labels — use scene-specific labels if available
+        const dimHex = '#' + (COLORS.textDim).toString(16).padStart(6, '0');
+        const loungeLabel = (currentZoneLabels && currentZoneLabels.lounge)
+            ? currentZoneLabels.lounge.label : '🛋 休息區 Lounge';
+        const workLabel = (currentZoneLabels && currentZoneLabels.workspace)
+            ? currentZoneLabels.workspace.label : '💻 工作區 Workspace';
+        const debugLabel = (currentZoneLabels && currentZoneLabels.debug)
+            ? currentZoneLabels.debug.label : '🐛 Debug Corner';
         const zones = [
-            { label: '🛋 休息區 Lounge', x: 100, y: floorY + 14 },
-            { label: '💻 工作區 Workspace', x: CANVAS_W / 2, y: floorY + 14 },
-            { label: '🐛 Debug Corner', x: CANVAS_W - 100, y: floorY + 14 },
+            { label: loungeLabel, x: 100, y: floorY + 14 },
+            { label: workLabel, x: CANVAS_W / 2, y: floorY + 14 },
+            { label: debugLabel, x: CANVAS_W - 100, y: floorY + 14 },
         ];
         zones.forEach(z => {
             this.add.text(z.x, z.y, z.label, {
                 fontSize: '10px',
                 fontFamily: "'ArkPixel', 'Courier New', monospace",
-                color: '#94a1b2',
+                color: dimHex,
             }).setOrigin(0.5, 0);
         });
     }
@@ -479,20 +522,37 @@ class OfficeScene extends Phaser.Scene {
     }
 }
 
-// --- Launch Phaser ---
-const config = {
-    type: Phaser.AUTO,
-    width: CANVAS_W,
-    height: CANVAS_H,
-    parent: 'game-container',
-    backgroundColor: '#0f0e17',
-    scene: [OfficeScene],
-    pixelArt: true,
-    roundPixels: true,
-    scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-    },
-};
+// --- Launch Phaser (with dynamic resolution) ---
+async function launchGame() {
+    // Try to load resolution from API
+    try {
+        const res = await fetch('/resolution');
+        if (res.ok) {
+            const data = await res.json();
+            CANVAS_W = data.canvas_width || 960;
+            CANVAS_H = data.canvas_height || 540;
+        }
+    } catch (e) {
+        console.warn('Could not load resolution, using defaults');
+    }
 
-const game = new Phaser.Game(config);
+    const bgHex = '#' + (COLORS.bg).toString(16).padStart(6, '0');
+    const config = {
+        type: Phaser.AUTO,
+        width: CANVAS_W,
+        height: CANVAS_H,
+        parent: 'game-container',
+        backgroundColor: bgHex,
+        scene: [OfficeScene],
+        pixelArt: true,
+        roundPixels: true,
+        scale: {
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
+        },
+    };
+
+    const game = new Phaser.Game(config);
+}
+
+launchGame();
