@@ -9,16 +9,18 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from flask import Flask, jsonify, request, send_from_directory
 from core.office import Office
 from core.agent import VALID_STATES, DEFAULT_AVATARS
+from core.history import HistoryLogger
 
 PORT = int(os.environ.get("STAR_OFFICE_PORT", 19200))
 STORE_PATH = os.environ.get("STAR_OFFICE_STORE", "office-state.json")
+LOG_DIR = os.environ.get("STAR_OFFICE_LOG_DIR", "logs")
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend-v2")
 
 app = Flask(__name__, static_folder=FRONTEND_DIR)
 
 
 def get_office():
-    return Office(STORE_PATH)
+    return Office(STORE_PATH, LOG_DIR)
 
 
 # --- Health ---
@@ -126,6 +128,38 @@ def set_state(agent_id):
         return jsonify({"error": f"Agent '{agent_id}' not found"}), 404
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+
+
+# --- History ---
+
+@app.route("/agents/<agent_id>/history", methods=["GET"])
+def get_history(agent_id):
+    hours = request.args.get("hours", 24, type=int)
+    limit = request.args.get("limit", 100, type=int)
+    hours = max(1, min(hours, 720))  # cap: 1h to 30 days
+    limit = max(1, min(limit, 1000))
+    logger = HistoryLogger(LOG_DIR)
+    entries = logger.get_history(agent_id, hours=hours, limit=limit)
+    return jsonify({"agent_id": agent_id, "entries": entries, "count": len(entries)})
+
+
+@app.route("/agents/<agent_id>/summary", methods=["GET"])
+def get_summary(agent_id):
+    hours = request.args.get("hours", 24, type=int)
+    hours = max(1, min(hours, 720))
+    logger = HistoryLogger(LOG_DIR)
+    summary = logger.get_summary(agent_id, hours=hours)
+    return jsonify(summary)
+
+
+@app.route("/history/cleanup", methods=["POST"])
+def cleanup_history():
+    data = request.get_json(silent=True) or {}
+    max_age_days = data.get("max_age_days", 30)
+    max_age_days = max(1, min(max_age_days, 365))
+    logger = HistoryLogger(LOG_DIR)
+    removed = logger.cleanup(max_age_days)
+    return jsonify({"removed_entries": removed, "max_age_days": max_age_days})
 
 
 # --- Frontend ---

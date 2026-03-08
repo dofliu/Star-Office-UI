@@ -2,11 +2,13 @@
 
 from core.agent import Agent
 from core import store
+from core.history import HistoryLogger
 
 
 class Office:
-    def __init__(self, store_path: str = "office-state.json"):
+    def __init__(self, store_path: str = "office-state.json", log_dir: str = "logs"):
         self.store_path = store_path
+        self.history = HistoryLogger(log_dir)
         self.agents: dict[str, Agent] = {}
         self._load()
 
@@ -42,8 +44,13 @@ class Office:
     def set_state(self, agent_id: str, state: str, message: str = "",
                   progress: int = 0) -> Agent:
         agent = self.get_agent(agent_id)
+        prev_state = agent.state
         agent.set_state(state, message, progress)
         self.save()
+        # Log state change
+        self.history.log_state_change(
+            agent_id, state, message, progress, prev_state=prev_state
+        )
         return agent
 
     def update_profile(self, agent_id: str, display_name: str | None = None,
