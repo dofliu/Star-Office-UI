@@ -71,6 +71,7 @@ class OfficeScene extends Phaser.Scene {
 
     create() {
         window.starOfficeScene = this;
+        this.currentZoom = 1.0;
 
         // Background: dark gradient feel with pixel grid
         this.drawBackground();
@@ -102,6 +103,9 @@ class OfficeScene extends Phaser.Scene {
 
         // Add agent button
         this.drawAddButton();
+
+        // Zoom controls
+        this.drawZoomControls();
     }
 
     drawBackground() {
@@ -172,6 +176,9 @@ class OfficeScene extends Phaser.Scene {
             this.agentData = data.agents || [];
             this.statusText.setText(`${this.agentData.length} agent(s) online — port 19200`);
             this.renderAgents();
+            // Update sidebar and check for state changes
+            if (typeof updateSidebar === 'function') updateSidebar(this.agentData);
+            if (typeof checkStateChanges === 'function') checkStateChanges(this.agentData);
         } catch (e) {
             this.statusText.setText('⚠ Connection failed');
             console.error('Fetch error:', e);
@@ -295,6 +302,28 @@ class OfficeScene extends Phaser.Scene {
             container.add(msgText);
         }
 
+        // Progress bar (if progress > 0)
+        if (agent.progress > 0) {
+            const barY = agent.message ? 138 : 118;
+            const barW = AGENT_CARD_W - 32;
+            const barH = 6;
+            const barX = 16;
+            const barBg = this.add.graphics();
+            barBg.fillStyle(0x16161a, 1);
+            barBg.fillRoundedRect(barX, barY, barW, barH, 3);
+            container.add(barBg);
+            const barFill = this.add.graphics();
+            barFill.fillStyle(stateColor, 1);
+            barFill.fillRoundedRect(barX, barY, barW * (agent.progress / 100), barH, 3);
+            container.add(barFill);
+            const pctText = this.add.text(AGENT_CARD_W - 16, barY - 1, `${agent.progress}%`, {
+                fontSize: '8px',
+                fontFamily: "'ArkPixel', 'Courier New', monospace",
+                color: '#94a1b2',
+            }).setOrigin(1, 0);
+            container.add(pctText);
+        }
+
         // ID badge (small, bottom)
         const idBadge = this.add.text(AGENT_CARD_W / 2, AGENT_CARD_H - 14, `#${agent.id}`, {
             fontSize: '9px',
@@ -305,12 +334,21 @@ class OfficeScene extends Phaser.Scene {
 
         // Settings gear button (top-left)
         const gear = this.add.text(8, 6, '⚙', { fontSize: '14px' }).setInteractive({ useHandCursor: true });
-        gear.on('pointerdown', () => {
+        gear.on('pointerdown', (pointer) => {
+            pointer.event.stopPropagation();
             if (typeof openSettings === 'function') {
                 openSettings(agent.id, agent.display_name, agent.avatar);
             }
         });
         container.add(gear);
+
+        // Click card to open detail panel
+        const hitArea = this.add.zone(AGENT_CARD_W / 2, AGENT_CARD_H / 2, AGENT_CARD_W, AGENT_CARD_H)
+            .setInteractive({ useHandCursor: true });
+        hitArea.on('pointerdown', () => {
+            if (typeof openDetail === 'function') openDetail(agent);
+        });
+        container.add(hitArea);
 
         container.setDepth(10);
         this.agentSprites[agent.id] = { container };
@@ -366,6 +404,62 @@ class OfficeScene extends Phaser.Scene {
         gfx.fillStyle(0x444444, 1);
         gfx.fillRect(x + 1*s, y + 12*s, 3*s, s);
         gfx.fillRect(x + 5*s, y + 12*s, 3*s, s);
+    }
+
+    drawZoomControls() {
+        const zoomY = CANVAS_H - 30;
+        const zoomX = 40;
+
+        // Zoom In
+        const zInBg = this.add.graphics();
+        zInBg.fillStyle(COLORS.panel, 0.9);
+        zInBg.fillRoundedRect(zoomX - 14, zoomY - 12, 28, 24, 6);
+        zInBg.lineStyle(1, COLORS.border, 0.8);
+        zInBg.strokeRoundedRect(zoomX - 14, zoomY - 12, 28, 24, 6);
+        const zInTxt = this.add.text(zoomX, zoomY, '+', {
+            fontSize: '14px', fontFamily: "'ArkPixel', 'Courier New', monospace", color: '#fffffe',
+        }).setOrigin(0.5, 0.5);
+        const zInHit = this.add.zone(zoomX, zoomY, 28, 24).setInteractive({ useHandCursor: true });
+        zInHit.on('pointerdown', () => this.setZoom(this.currentZoom + 0.25));
+
+        // Zoom Out
+        const zOutX = zoomX + 36;
+        const zOutBg = this.add.graphics();
+        zOutBg.fillStyle(COLORS.panel, 0.9);
+        zOutBg.fillRoundedRect(zOutX - 14, zoomY - 12, 28, 24, 6);
+        zOutBg.lineStyle(1, COLORS.border, 0.8);
+        zOutBg.strokeRoundedRect(zOutX - 14, zoomY - 12, 28, 24, 6);
+        const zOutTxt = this.add.text(zOutX, zoomY, '-', {
+            fontSize: '14px', fontFamily: "'ArkPixel', 'Courier New', monospace", color: '#fffffe',
+        }).setOrigin(0.5, 0.5);
+        const zOutHit = this.add.zone(zOutX, zoomY, 28, 24).setInteractive({ useHandCursor: true });
+        zOutHit.on('pointerdown', () => this.setZoom(this.currentZoom - 0.25));
+
+        // Reset
+        const zResetX = zOutX + 40;
+        const zResetBg = this.add.graphics();
+        zResetBg.fillStyle(COLORS.panel, 0.9);
+        zResetBg.fillRoundedRect(zResetX - 18, zoomY - 12, 36, 24, 6);
+        zResetBg.lineStyle(1, COLORS.border, 0.8);
+        zResetBg.strokeRoundedRect(zResetX - 18, zoomY - 12, 36, 24, 6);
+        const zResetTxt = this.add.text(zResetX, zoomY, '1:1', {
+            fontSize: '10px', fontFamily: "'ArkPixel', 'Courier New', monospace", color: '#94a1b2',
+        }).setOrigin(0.5, 0.5);
+        const zResetHit = this.add.zone(zResetX, zoomY, 36, 24).setInteractive({ useHandCursor: true });
+        zResetHit.on('pointerdown', () => this.setZoom(1.0));
+
+        // Zoom label
+        this.zoomLabel = this.add.text(zResetX + 34, zoomY, '100%', {
+            fontSize: '9px', fontFamily: "'ArkPixel', 'Courier New', monospace", color: '#555',
+        }).setOrigin(0, 0.5);
+    }
+
+    setZoom(level) {
+        this.currentZoom = Math.max(0.5, Math.min(2.0, level));
+        this.cameras.main.setZoom(this.currentZoom);
+        if (this.zoomLabel) {
+            this.zoomLabel.setText(`${Math.round(this.currentZoom * 100)}%`);
+        }
     }
 
     promptAddAgent() {

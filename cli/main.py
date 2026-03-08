@@ -27,7 +27,8 @@ def cmd_remove(args):
 
 def cmd_set(args):
     office = Office(args.store)
-    agent = office.set_state(args.id, args.state, args.message or "")
+    agent = office.set_state(args.id, args.state, args.message or "",
+                             args.progress)
     print(f"Updated: {agent}")
 
 
@@ -73,6 +74,7 @@ def main():
     p.add_argument("id", help="Agent ID")
     p.add_argument("state", help="State: idle, writing, researching, executing, syncing, error")
     p.add_argument("message", nargs="?", default="", help="Optional status message")
+    p.add_argument("--progress", type=int, default=0, help="Progress 0-100 (default: 0)")
 
     # list
     sub.add_parser("list", help="List all agents")

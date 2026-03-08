@@ -113,13 +113,14 @@ def set_state(agent_id):
     data = request.get_json(silent=True) or {}
     state = data.get("state")
     message = data.get("message", "")
+    progress = data.get("progress", 0)
 
     if not state:
         return jsonify({"error": "Missing 'state'"}), 400
 
     office = get_office()
     try:
-        agent = office.set_state(agent_id, state, message)
+        agent = office.set_state(agent_id, state, message, progress)
         return jsonify(agent.to_dict())
     except KeyError:
         return jsonify({"error": f"Agent '{agent_id}' not found"}), 404

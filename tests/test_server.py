@@ -190,3 +190,79 @@ def test_full_workflow(client):
     client.delete("/agents/gemini")
     r = client.get("/agents")
     assert len(r.get_json()["agents"]) == 1
+
+
+# --- Phase 4: Progress field tests ---
+
+def test_set_state_with_progress(client):
+    """Setting state with progress field."""
+    client.post("/agents", json={"id": "a1", "name": "Alice"})
+    r = client.post("/agents/a1/state", json={
+        "state": "writing", "message": "coding", "progress": 42
+    })
+    assert r.status_code == 200
+    data = r.get_json()
+    assert data["progress"] == 42
+    assert data["state"] == "writing"
+
+
+def test_progress_default_zero(client):
+    """Progress defaults to 0 when not provided."""
+    client.post("/agents", json={"id": "a1", "name": "Alice"})
+    r = client.post("/agents/a1/state", json={"state": "writing"})
+    assert r.get_json()["progress"] == 0
+
+
+def test_progress_in_agent_data(client):
+    """Progress field is present in agent listing."""
+    client.post("/agents", json={"id": "a1", "name": "Alice"})
+    r = client.get("/agents/a1")
+    assert "progress" in r.get_json()
+
+
+def test_progress_clamped(client):
+    """Progress is clamped between 0 and 100."""
+    client.post("/agents", json={"id": "a1", "name": "Alice"})
+    # Over 100
+    r = client.post("/agents/a1/state", json={
+        "state": "writing", "progress": 200
+    })
+    assert r.get_json()["progress"] == 100
+    # Below 0
+    r = client.post("/agents/a1/state", json={
+        "state": "writing", "progress": -10
+    })
+    assert r.get_json()["progress"] == 0
+
+
+def test_progress_resets_on_idle(client):
+    """Progress resets to 0 when state is set to idle."""
+    client.post("/agents", json={"id": "a1", "name": "Alice"})
+    client.post("/agents/a1/state", json={
+        "state": "writing", "progress": 75
+    })
+    r = client.post("/agents/a1/state", json={"state": "idle"})
+    assert r.get_json()["progress"] == 0
+
+
+def test_full_workflow_with_progress(client):
+    """End-to-end workflow including progress tracking."""
+    client.post("/agents", json={"id": "dev", "name": "Developer"})
+    # Start work with progress
+    client.post("/agents/dev/state", json={
+        "state": "executing", "message": "Running tests", "progress": 30
+    })
+    r = client.get("/agents/dev")
+    data = r.get_json()
+    assert data["state"] == "executing"
+    assert data["progress"] == 30
+    # Update progress
+    client.post("/agents/dev/state", json={
+        "state": "executing", "message": "Almost done", "progress": 90
+    })
+    r = client.get("/agents/dev")
+    assert r.get_json()["progress"] == 90
+    # Complete -> back to idle
+    client.post("/agents/dev/state", json={"state": "idle"})
+    r = client.get("/agents/dev")
+    assert r.get_json()["progress"] == 0
