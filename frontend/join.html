@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>加入 Star 的像素办公室</title>
+    <title>加入 Star 的畫素辦公室</title>
     <style>
         @font-face {
             font-family: 'ArkPixel';
@@ -100,26 +100,26 @@
     </style>
 </head>
 <body>
-    <h1>⭐ 加入 Star 的像素办公室</h1>
+    <h1>⭐ 加入 Star 的畫素辦公室</h1>
     <div class="container">
         <div class="form-group">
-            <label>你的名字（会显示在办公室）</label>
-            <input type="text" id="agentName" placeholder="例如：小龙虾助手" maxlength="20">
+            <label>你的名字（會顯示在辦公室）</label>
+            <input type="text" id="agentName" placeholder="例如：小龍蝦助手" maxlength="20">
         </div>
-        <!-- 状态与细节改为自动同步，不在 join 页面填写 -->
+        <!-- 狀態與細節改為自動同步，不在 join 頁面填寫 -->
         <div class="form-group">
-            <label>Agent 接入密钥（一次性）</label>
-            <input type="text" id="joinKey" placeholder="请输入你拿到的 join key" maxlength="64">
+            <label>Agent 接入金鑰（一次性）</label>
+            <input type="text" id="joinKey" placeholder="請輸入你拿到的 join key" maxlength="64">
         </div>
-        <button id="joinBtn">加入办公室</button>
-        <button id="leaveBtn" style="margin-top:10px; background:#555; border-color:#555;">离开办公室</button>
+        <button id="joinBtn">加入辦公室</button>
+        <button id="leaveBtn" style="margin-top:10px; background:#555; border-color:#555;">離開辦公室</button>
         <div id="status" class="status" style="display:none;"></div>
     </div>
     <div class="note">
-        ⚠️ 注意：join 页面仅需要名字 + 一次性 join key<br>
-        状态与状态细节会由 agent 后续自动推送同步
+        ⚠️ 注意：join 頁面僅需要名字 + 一次性 join key<br>
+        狀態與狀態細節會由 agent 後續自動推送同步
         <br><br>
-        📌 邀请说明：
+        📌 邀請說明：
         <a href="/invite" style="color:#ffd700; text-decoration: underline;">https://office.example.com/invite</a>
     </div>
 
@@ -140,11 +140,11 @@
             const name = agentNameInput.value.trim();
             const joinKey = joinKeyInput.value.trim();
             if (!name) {
-                showStatus('请先输入你的名字～', false);
+                showStatus('請先輸入你的名字～', false);
                 return;
             }
             if (!joinKey) {
-                showStatus('请先输入 Agent 接入密钥～', false);
+                showStatus('請先輸入 Agent 接入金鑰～', false);
                 return;
             }
             try {
@@ -155,19 +155,19 @@
                 });
                 const data = await response.json();
                 if (data.ok) {
-                    showStatus('加入成功！刷新办公室就能看到你啦 ✨', true);
+                    showStatus('加入成功！重新整理辦公室就能看到你啦 ✨', true);
                 } else {
-                    showStatus(data.msg || '加入失败', false);
+                    showStatus(data.msg || '加入失敗', false);
                 }
             } catch (e) {
-                showStatus('网络出错，请重试', false);
+                showStatus('網路出錯，請重試', false);
             }
         }
 
         async function leave() {
             const name = agentNameInput.value.trim();
             if (!name) {
-                showStatus('请先输入你要离开的名字～', false);
+                showStatus('請先輸入你要離開的名字～', false);
                 return;
             }
             try {
@@ -178,12 +178,12 @@
                 });
                 const data = await response.json();
                 if (data.ok) {
-                    showStatus('已离开办公室 👋', true);
+                    showStatus('已離開辦公室 👋', true);
                 } else {
-                    showStatus(data.msg || '离开失败', false);
+                    showStatus(data.msg || '離開失敗', false);
                 }
             } catch (e) {
-                showStatus('网络出错，请重试', false);
+                showStatus('網路出錯，請重試', false);
             }
         }
 

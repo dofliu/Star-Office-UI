@@ -1,10 +1,10 @@
-// Star Office UI - 游戏主逻辑
-// 依赖: layout.js（必须在这个之前加载）
+// Star Office UI - 遊戲主邏輯
+// 依賴: layout.js（必須在這個之前載入）
 
-// 检测浏览器是否支持 WebP
+// 檢測瀏覽器是否支援 WebP
 let supportsWebP = false;
 
-// 方法 1: 使用 canvas 检测
+// 方法 1: 使用 canvas 檢測
 function checkWebPSupport() {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
@@ -16,7 +16,7 @@ function checkWebPSupport() {
   });
 }
 
-// 方法 2: 使用 image 检测（备用）
+// 方法 2: 使用 image 檢測（備用）
 function checkWebPSupportFallback() {
   return new Promise((resolve) => {
     const img = new Image();
@@ -26,13 +26,13 @@ function checkWebPSupportFallback() {
   });
 }
 
-// 获取文件扩展名（根据 WebP 支持情况 + 布局配置的 forcePng）
+// 獲取副檔名（根據 WebP 支援情況 + 佈局配置的 forcePng）
 function getExt(pngFile) {
-  // star-working-spritesheet.png 太宽了，WebP 不支持，始终用 PNG
+  // star-working-spritesheet.png 太寬了，WebP 不支援，始終用 PNG
   if (pngFile === 'star-working-spritesheet.png') {
     return '.png';
   }
-  // 如果布局配置里强制用 PNG，就用 .png
+  // 如果佈局配置裡強制用 PNG，就用 .png
   if (LAYOUT.forcePng && LAYOUT.forcePng[pngFile.replace(/\.(png|webp)$/, '')]) {
     return '.png';
   }
@@ -53,7 +53,7 @@ let totalAssets = 0;
 let loadedAssets = 0;
 let loadingProgressBar, loadingProgressContainer, loadingOverlay, loadingText;
 
-// Memo 相关函数
+// Memo 相關函式
 async function loadMemo() {
   const memoDate = document.getElementById('memo-date');
   const memoContent = document.getElementById('memo-content');
@@ -66,15 +66,15 @@ async function loadMemo() {
       memoDate.textContent = data.date || '';
       memoContent.innerHTML = data.memo.replace(/\n/g, '<br>');
     } else {
-      memoContent.innerHTML = '<div id="memo-placeholder">暂无昨日日记</div>';
+      memoContent.innerHTML = '<div id="memo-placeholder">暫無昨日日記</div>';
     }
   } catch (e) {
-    console.error('加载 memo 失败:', e);
-    memoContent.innerHTML = '<div id="memo-placeholder">加载失败</div>';
+    console.error('載入 memo 失敗:', e);
+    memoContent.innerHTML = '<div id="memo-placeholder">載入失敗</div>';
   }
 }
 
-// 更新加载进度
+// 更新載入進度
 function updateLoadingProgress() {
   loadedAssets++;
   const percent = Math.min(100, Math.round((loadedAssets / totalAssets) * 100));
@@ -82,11 +82,11 @@ function updateLoadingProgress() {
     loadingProgressBar.style.width = percent + '%';
   }
   if (loadingText) {
-    loadingText.textContent = `正在加载 Star 的像素办公室... ${percent}%`;
+    loadingText.textContent = `正在載入 Star 的畫素辦公室... ${percent}%`;
   }
 }
 
-// 隐藏加载界面
+// 隱藏載入介面
 function hideLoadingOverlay() {
   setTimeout(() => {
     if (loadingOverlay) {
@@ -101,89 +101,89 @@ function hideLoadingOverlay() {
 
 const STATES = {
   idle: { name: '待命', area: 'breakroom' },
-  writing: { name: '整理文档', area: 'writing' },
-  researching: { name: '搜索信息', area: 'researching' },
-  executing: { name: '执行任务', area: 'writing' },
-  syncing: { name: '同步备份', area: 'writing' },
-  error: { name: '出错了', area: 'error' }
+  writing: { name: '整理檔案', area: 'writing' },
+  researching: { name: '搜尋資訊', area: 'researching' },
+  executing: { name: '執行任務', area: 'writing' },
+  syncing: { name: '同步備份', area: 'writing' },
+  error: { name: '出錯了', area: 'error' }
 };
 
 const BUBBLE_TEXTS = {
   idle: [
-    '待命中：耳朵竖起来了',
-    '我在这儿，随时可以开工',
-    '先把桌面收拾干净再说',
-    '呼——给大脑放个风',
-    '今天也要优雅地高效',
-    '等待，是为了更准确的一击',
-    '咖啡还热，灵感也还在',
-    '我在后台给你加 Buff',
-    '状态：静心 / 充电',
-    '小猫说：慢一点也没关系'
+    '待命中：耳朵豎起來了',
+    '我在這兒，隨時可以開工',
+    '先把桌面收拾乾淨再說',
+    '呼——給大腦放個風',
+    '今天也要優雅地高效',
+    '等待，是為了更準確的一擊',
+    '咖啡還熱，靈感也還在',
+    '我在後臺給你加 Buff',
+    '狀態：靜心 / 充電',
+    '小貓說：慢一點也沒關係'
   ],
   writing: [
-    '进入专注模式：勿扰',
-    '先把关键路径跑通',
-    '我来把复杂变简单',
-    '把 bug 关进笼子里',
-    '写到一半，先保存',
-    '把每一步都做成可回滚',
-    '今天的进度，明天的底气',
-    '先收敛，再发散',
-    '让系统变得更可解释',
-    '稳住，我们能赢'
+    '進入專注模式：勿擾',
+    '先把關鍵路徑跑通',
+    '我來把複雜變簡單',
+    '把 bug 關進籠子裡',
+    '寫到一半，先儲存',
+    '把每一步都做成可回滾',
+    '今天的進度，明天的底氣',
+    '先收斂，再發散',
+    '讓系統變得更可解釋',
+    '穩住，我們能贏'
   ],
   researching: [
-    '我在挖证据链',
-    '让我把信息熬成结论',
-    '找到了：关键在这里',
-    '先把变量控制住',
-    '我在查：它为什么会这样',
-    '把直觉写成验证',
-    '先定位，再优化',
-    '别急，先画因果图'
+    '我在挖證據鏈',
+    '讓我把資訊熬成結論',
+    '找到了：關鍵在這裡',
+    '先把變數控制住',
+    '我在查：它為什麼會這樣',
+    '把直覺寫成驗證',
+    '先定位，再最佳化',
+    '別急，先畫因果圖'
   ],
   executing: [
-    '执行中：不要眨眼',
-    '把任务切成小块逐个击破',
-    '开始跑 pipeline',
-    '一键推进：走你',
-    '让结果自己说话',
+    '執行中：不要眨眼',
+    '把任務切成小塊逐個擊破',
+    '開始跑 pipeline',
+    '一鍵推進：走你',
+    '讓結果自己說話',
     '先做最小可行，再做最美版本'
   ],
   syncing: [
-    '同步中：把今天锁进云里',
-    '备份不是仪式，是安全感',
-    '写入中…别断电',
-    '把变更交给时间戳',
-    '云端对齐：咔哒',
-    '同步完成前先别乱动',
-    '把未来的自己从灾难里救出来',
-    '多一份备份，少一份后悔'
+    '同步中：把今天鎖進雲裡',
+    '備份不是儀式，是安全感',
+    '寫入中…別斷電',
+    '把變更交給時間戳',
+    '雲端對齊：咔噠',
+    '同步完成前先別亂動',
+    '把未來的自己從災難裡救出來',
+    '多一份備份，少一份後悔'
   ],
   error: [
-    '警报响了：先别慌',
-    '我闻到 bug 的味道了',
-    '先复现，再谈修复',
-    '把日志给我，我会说人话',
-    '错误不是敌人，是线索',
-    '把影响面圈起来',
-    '先止血，再手术',
-    '我在：马上定位根因',
-    '别怕，这种我见多了',
-    '报警中：让问题自己现形'
+    '警報響了：先別慌',
+    '我聞到 bug 的味道了',
+    '先復現，再談修復',
+    '把日誌給我，我會說人話',
+    '錯誤不是敵人，是線索',
+    '把影響面圈起來',
+    '先止血，再手術',
+    '我在：馬上定位根因',
+    '別怕，這種我見多了',
+    '報警中：讓問題自己現形'
   ],
   cat: [
     '喵~',
-    '咕噜咕噜…',
-    '尾巴摇一摇',
-    '晒太阳最开心',
-    '有人来看我啦',
-    '我是这个办公室的吉祥物',
-    '伸个懒腰',
-    '今天的罐罐准备好了吗',
-    '呼噜呼噜',
-    '这个位置视野最好'
+    '咕嚕咕嚕…',
+    '尾巴搖一搖',
+    '曬太陽最開心',
+    '有人來看我啦',
+    '我是這個辦公室的吉祥物',
+    '伸個懶腰',
+    '今天的罐罐準備好了嗎',
+    '呼嚕呼嚕',
+    '這個位置視野最好'
   ]
 };
 
@@ -203,7 +203,7 @@ let agents = {}; // agentId -> sprite/container
 let lastAgentsFetch = 0;
 const AGENTS_FETCH_INTERVAL = 2500;
 
-// agent 颜色配置
+// agent 顏色配置
 const AGENT_COLORS = {
   star: 0xffd700,
   npc1: 0x00aaff,
@@ -211,7 +211,7 @@ const AGENT_COLORS = {
   default: 0x94a3b8
 };
 
-// agent 名字颜色
+// agent 名字顏色
 const NAME_TAG_COLORS = {
   approved: 0x22c55e,
   pending: 0xf59e0b,
@@ -220,7 +220,7 @@ const NAME_TAG_COLORS = {
   default: 0x1f2937
 };
 
-// breakroom / writing / error 区域的 agent 分布位置（多 agent 时错开）
+// breakroom / writing / error 區域的 agent 分佈位置（多 agent 時錯開）
 const AREA_POSITIONS = {
   breakroom: [
     { x: 620, y: 180 },
@@ -255,7 +255,7 @@ const AREA_POSITIONS = {
 };
 
 
-// 状态控制栏函数（用于测试）
+// 狀態控制欄函式（用於測試）
 function setState(state, detail) {
   fetch('/set_state', {
     method: 'POST',
@@ -264,7 +264,7 @@ function setState(state, detail) {
   }).then(() => fetchStatus());
 }
 
-// 初始化：先检测 WebP 支持，再启动游戏
+// 初始化：先檢測 WebP 支援，再啟動遊戲
 async function initGame() {
   try {
     supportsWebP = await checkWebPSupport();
@@ -276,7 +276,7 @@ async function initGame() {
     }
   }
 
-  console.log('WebP 支持:', supportsWebP);
+  console.log('WebP 支援:', supportsWebP);
   new Phaser.Game(config);
 }
 
@@ -286,7 +286,7 @@ function preload() {
   loadingText = document.getElementById('loading-text');
   loadingProgressContainer = document.getElementById('loading-progress-container');
 
-  // 从 LAYOUT 读取总资源数量（避免 magic number）
+  // 從 LAYOUT 讀取總資源數量（避免 magic number）
   totalAssets = LAYOUT.totalAssets || 15;
   loadedAssets = 0;
 
@@ -317,16 +317,21 @@ function preload() {
   this.load.spritesheet('sync_anim', '/static/sync-animation-spritesheet-grid' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 256, frameHeight: 256 });
   this.load.image('memo_bg', '/static/memo-bg' + (supportsWebP ? '.webp' : '.png'));
 
-  // 新办公桌：强制 PNG（透明）
+  // 新辦公桌：強制 PNG（透明）
   this.load.image('desk_v2', '/static/desk-v2.png');
   this.load.spritesheet('flowers', '/static/flowers-spritesheet' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 65, frameHeight: 65 });
 }
 
 function create() {
   game = this;
+  
+  // Debug: 記錄當前場景
+  console.log('Phaser create() - currentSceneId:', typeof currentSceneId !== 'undefined' ? currentSceneId : 'undefined');
+  console.log('Phaser create() - LAYOUT areas:', LAYOUT.areas);
+  
   this.add.image(640, 360, 'office_bg');
 
-  // === 沙发（来自 LAYOUT）===
+  // === 沙發（來自 LAYOUT）===
   sofa = this.add.sprite(
     LAYOUT.furniture.sofa.x,
     LAYOUT.furniture.sofa.y,
@@ -396,7 +401,7 @@ function create() {
   const plaqueY = LAYOUT.plaque.y;
   const plaqueBg = game.add.rectangle(plaqueX, plaqueY, LAYOUT.plaque.width, LAYOUT.plaque.height, 0x5d4037);
   plaqueBg.setStrokeStyle(3, 0x3e2723);
-  const plaqueText = game.add.text(plaqueX, plaqueY, '海辛小龙虾的办公室', {
+  const plaqueText = game.add.text(plaqueX, plaqueY, '海辛小龍蝦的辦公室', {
     fontFamily: 'ArkPixel, monospace',
     fontSize: '18px',
     fill: '#ffd700',
@@ -407,7 +412,7 @@ function create() {
   game.add.text(plaqueX - 190, plaqueY, '⭐', { fontFamily: 'ArkPixel, monospace', fontSize: '20px' }).setOrigin(0.5);
   game.add.text(plaqueX + 190, plaqueY, '⭐', { fontFamily: 'ArkPixel, monospace', fontSize: '20px' }).setOrigin(0.5);
 
-  // === 植物们（来自 LAYOUT）===
+  // === 植物們（來自 LAYOUT）===
   const plantFrameCount = 16;
   for (let i = 0; i < LAYOUT.furniture.plants.length; i++) {
     const p = LAYOUT.furniture.plants[i];
@@ -422,7 +427,7 @@ function create() {
     }));
   }
 
-  // === 海报（来自 LAYOUT）===
+  // === 海報（來自 LAYOUT）===
   const postersFrameCount = 32;
   const randomPosterFrame = Math.floor(Math.random() * postersFrameCount);
   const poster = game.add.sprite(LAYOUT.furniture.poster.x, LAYOUT.furniture.poster.y, 'posters', randomPosterFrame).setOrigin(0.5);
@@ -435,7 +440,7 @@ function create() {
     window.posterSprite.setFrame(next);
   });
 
-  // === 小猫（来自 LAYOUT）===
+  // === 小貓（來自 LAYOUT）===
   const catsFrameCount = 16;
   const randomCatFrame = Math.floor(Math.random() * catsFrameCount);
   const cat = game.add.sprite(LAYOUT.furniture.cat.x, LAYOUT.furniture.cat.y, 'cats', randomCatFrame).setOrigin(LAYOUT.furniture.cat.origin.x, LAYOUT.furniture.cat.origin.y);
@@ -448,7 +453,7 @@ function create() {
     window.catSprite.setFrame(next);
   });
 
-  // === 咖啡机（来自 LAYOUT）===
+  // === 咖啡機（來自 LAYOUT）===
   this.anims.create({
     key: 'coffee_machine',
     frames: this.anims.generateFrameNumbers('coffee_machine', { start: 0, end: 95 }),
@@ -463,7 +468,7 @@ function create() {
   coffeeMachine.setDepth(LAYOUT.furniture.coffeeMachine.depth);
   coffeeMachine.anims.play('coffee_machine', true);
 
-  // === 服务器区（来自 LAYOUT）===
+  // === 伺服器區（來自 LAYOUT）===
   this.anims.create({
     key: 'serverroom_on',
     frames: this.anims.generateFrameNumbers('serverroom', { start: 0, end: 39 }),
@@ -480,7 +485,7 @@ function create() {
   serverroom.anims.stop();
   serverroom.setFrame(0);
 
-  // === 新办公桌（来自 LAYOUT，强制透明 PNG）===
+  // === 新辦公桌（來自 LAYOUT，強制透明 PNG）===
   const desk = this.add.image(
     LAYOUT.furniture.desk.x,
     LAYOUT.furniture.desk.y,
@@ -488,7 +493,7 @@ function create() {
   ).setOrigin(LAYOUT.furniture.desk.origin.x, LAYOUT.furniture.desk.origin.y);
   desk.setDepth(LAYOUT.furniture.desk.depth);
 
-  // === 花盆（来自 LAYOUT）===
+  // === 花盆（來自 LAYOUT）===
   const flowerFrameCount = 16;
   const randomFlowerFrame = Math.floor(Math.random() * flowerFrameCount);
   const flower = this.add.sprite(
@@ -507,7 +512,7 @@ function create() {
     window.flowerSprite.setFrame(next);
   });
 
-  // === Star 在桌前工作（来自 LAYOUT）===
+  // === Star 在桌前工作（來自 LAYOUT）===
   this.anims.create({
     key: 'star_working',
     frames: this.anims.generateFrameNumbers('star_working', { start: 0, end: 191 }),
@@ -521,7 +526,7 @@ function create() {
     repeat: -1
   });
 
-  // === 错误 bug（来自 LAYOUT）===
+  // === 錯誤 bug（來自 LAYOUT）===
   const errorBug = this.add.sprite(
     LAYOUT.furniture.errorBug.x,
     LAYOUT.furniture.errorBug.y,
@@ -546,7 +551,7 @@ function create() {
   starWorking.setDepth(LAYOUT.furniture.starWorking.depth);
   window.starWorking = starWorking;
 
-  // === 同步动画（来自 LAYOUT）===
+  // === 同步動畫（來自 LAYOUT）===
   this.anims.create({
     key: 'sync_anim',
     frames: this.anims.generateFrameNumbers('sync_anim', { start: 1, end: 52 }),
@@ -573,7 +578,7 @@ function create() {
   coordsToggle.addEventListener('click', () => {
     showCoords = !showCoords;
     coordsOverlay.style.display = showCoords ? 'block' : 'none';
-    coordsToggle.textContent = showCoords ? '隐藏坐标' : '显示坐标';
+    coordsToggle.textContent = showCoords ? '隱藏座標' : '顯示座標';
     coordsToggle.style.background = showCoords ? '#e94560' : '#333';
   });
 
@@ -590,7 +595,7 @@ function create() {
   fetchStatus();
   fetchAgents();
 
-  // 可选调试：仅在显式开启 debug 模式时渲染测试用尼卡 agent
+  // 可選除錯：僅在顯式開啟 debug 模式時渲染測試用尼卡 agent
   let debugAgents = false;
   try {
     if (typeof window !== 'undefined') {
@@ -613,7 +618,7 @@ function create() {
       name: '尼卡',
       isMain: false,
       state: 'writing',
-      detail: '在画像素画...',
+      detail: '在畫畫素畫...',
       area: 'writing',
       authStatus: 'approved',
       updated_at: new Date().toISOString()
@@ -630,7 +635,7 @@ function create() {
         name: '尼卡',
         isMain: false,
         state: window.testNikaState,
-        detail: '在画像素画...',
+        detail: '在畫畫素畫...',
         area: areas[window.testNikaState],
         authStatus: 'approved',
         updated_at: new Date().toISOString()
@@ -806,7 +811,7 @@ function fetchStatus() {
       }
     })
     .catch(error => {
-      typewriterTarget = '连接失败，正在重试...';
+      typewriterTarget = '連線失敗，正在重試...';
       typewriterText = '';
       typewriterIndex = 0;
     });
@@ -921,7 +926,7 @@ function showBubble() {
 function showCatBubble() {
   if (!window.catSprite) return;
   if (window.catBubble) { window.catBubble.destroy(); window.catBubble = null; }
-  const texts = BUBBLE_TEXTS.cat || ['喵~', '咕噜咕噜…'];
+  const texts = BUBBLE_TEXTS.cat || ['喵~', '咕嚕咕嚕…'];
   const text = texts[Math.floor(Math.random() * texts.length)];
   const anchorX = window.catSprite.x;
   const anchorY = window.catSprite.y - 60;
@@ -938,8 +943,8 @@ function fetchAgents() {
     .then(response => response.json())
     .then(data => {
       if (!Array.isArray(data)) return;
-      // 重置位置计数器
-      // 按区域分配不同位置索引，避免重叠
+      // 重置位置計數器
+      // 按區域分配不同位置索引，避免重疊
       const areaSlots = { breakroom: 0, writing: 0, error: 0 };
       for (let agent of data) {
         const area = agent.area || 'breakroom';
@@ -959,22 +964,22 @@ function fetchAgents() {
       }
     })
     .catch(error => {
-      console.error('拉取 agents 失败:', error);
+      console.error('拉取 agents 失敗:', error);
     });
 }
 
-// 場景切換函數（在 HTML 按鈕中調用）
+// 場景切換函式（在 HTML 按鈕中呼叫）
 function doSwitchScene(sceneId) {
   if (!window.game || !window.game.scene) {
     console.error('遊戲未初始化');
     return;
   }
   
-  // 調用全局切換函數
+  // 呼叫全域性切換函式
   window.switchToScene(sceneId);
 }
 
-// 全局場景切換函數
+// 全域性場景切換函式
 window.switchToScene = function(sceneId) {
   if (!window.game || !window.game.scene) {
     console.error('遊戲未初始化');
@@ -995,16 +1000,16 @@ function renderAgent(agent) {
   const authStatus = agent.authStatus || 'pending';
   const isMain = !!agent.isMain;
 
-  // 获取这个 agent 在区域里的位置
+  // 獲取這個 agent 在區域裡的位置
   const pos = getAreaPosition(area, agent._slotIndex || 0);
   const baseX = pos.x;
   const baseY = pos.y;
 
-  // 颜色
+  // 顏色
   const bodyColor = AGENT_COLORS[agentId] || AGENT_COLORS.default;
   const nameColor = NAME_TAG_COLORS[authStatus] || NAME_TAG_COLORS.default;
 
-  // 透明度（离线/待批准/拒绝时变半透明）
+  // 透明度（離線/待批准/拒絕時變半透明）
   let alpha = 1;
   if (authStatus === 'pending') alpha = 0.7;
   if (authStatus === 'rejected') alpha = 0.4;
@@ -1013,16 +1018,16 @@ function renderAgent(agent) {
   if (!agents[agentId]) {
     // 新建 agent
     const container = game.add.container(baseX, baseY);
-    container.setDepth(1200 + (isMain ? 100 : 0)); // 放到最顶层！
+    container.setDepth(1200 + (isMain ? 100 : 0)); // 放到最頂層！
 
-    // 像素小人：用星星图标，更明显
+    // 畫素小人：用星星圖示，更明顯
     const starIcon = game.add.text(0, 0, '⭐', {
       fontFamily: 'ArkPixel, monospace',
       fontSize: '32px'
     }).setOrigin(0.5);
     starIcon.name = 'starIcon';
 
-    // 名字标签（漂浮）
+    // 名字標籤（漂浮）
     const nameTag = game.add.text(0, -36, name, {
       fontFamily: 'ArkPixel, monospace',
       fontSize: '14px',
@@ -1033,7 +1038,7 @@ function renderAgent(agent) {
     }).setOrigin(0.5);
     nameTag.name = 'nameTag';
 
-    // 状态小点（绿色/黄色/红色）
+    // 狀態小點（綠色/黃色/紅色）
     let dotColor = 0x64748b;
     if (authStatus === 'approved') dotColor = 0x22c55e;
     if (authStatus === 'pending') dotColor = 0xf59e0b;
@@ -1052,13 +1057,13 @@ function renderAgent(agent) {
     container.setAlpha(alpha);
     container.setDepth(1200 + (isMain ? 100 : 0));
 
-    // 更新名字和颜色（如果变化）
+    // 更新名字和顏色（如果變化）
     const nameTag = container.getAt(2);
     if (nameTag && nameTag.name === 'nameTag') {
       nameTag.setText(name);
       nameTag.setFill('#' + (NAME_TAG_COLORS[authStatus] || NAME_TAG_COLORS.default).toString(16).padStart(6, '0'));
     }
-    // 更新状态点颜色
+    // 更新狀態點顏色
     const statusDot = container.getAt(1);
     if (statusDot && statusDot.name === 'statusDot') {
       let dotColor = 0x64748b;
@@ -1071,5 +1076,5 @@ function renderAgent(agent) {
   }
 }
 
-// 启动游戏
+// 啟動遊戲
 initGame();
