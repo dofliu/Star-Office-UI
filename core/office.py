@@ -45,6 +45,16 @@ class Office:
         self.save()
         return agent
 
+    def update_profile(self, agent_id: str, display_name: str | None = None,
+                       avatar: str | None = None) -> Agent:
+        agent = self.get_agent(agent_id)
+        if display_name is not None:
+            agent.display_name = display_name
+        if avatar is not None:
+            agent.avatar = avatar
+        self.save()
+        return agent
+
     def check_all_ttl(self) -> list[str]:
         """Check TTL for all agents. Returns list of agent IDs that were reset."""
         reset_ids = []

@@ -24,8 +24,8 @@ def test_health(client):
     assert r.get_json()["status"] == "ok"
 
 
-def test_index_empty(client):
-    r = client.get("/")
+def test_api_status_empty(client):
+    r = client.get("/api/status")
     data = r.get_json()
     assert data["service"] == "Star Office"
     assert data["agent_count"] == 0
@@ -100,6 +100,69 @@ def test_remove_not_found(client):
     assert r.status_code == 404
 
 
+def test_update_profile_display_name(client):
+    client.post("/agents", json={"id": "a1", "name": "Claude Code"})
+    r = client.post("/agents/a1/profile", json={"display_name": "Agent K"})
+    assert r.status_code == 200
+    data = r.get_json()
+    assert data["display_name"] == "Agent K"
+    assert data["label"] == "Agent K"
+
+
+def test_update_profile_avatar(client):
+    client.post("/agents", json={"id": "a1", "name": "Claude Code"})
+    r = client.post("/agents/a1/profile", json={"avatar": "char_red"})
+    assert r.status_code == 200
+    assert r.get_json()["avatar"] == "char_red"
+
+
+def test_update_profile_not_found(client):
+    r = client.post("/agents/nope/profile", json={"display_name": "X"})
+    assert r.status_code == 404
+
+
+def test_update_profile_no_fields(client):
+    client.post("/agents", json={"id": "a1", "name": "Alice"})
+    r = client.post("/agents/a1/profile", json={})
+    assert r.status_code == 400
+
+
+def test_label_fallback(client):
+    """Label falls back to name when display_name is empty."""
+    client.post("/agents", json={"id": "a1", "name": "Claude Code"})
+    r = client.get("/agents/a1")
+    assert r.get_json()["label"] == "Claude Code"
+    # Set display name
+    client.post("/agents/a1/profile", json={"display_name": "Agent K"})
+    r = client.get("/agents/a1")
+    assert r.get_json()["label"] == "Agent K"
+    # Clear display name -> falls back
+    client.post("/agents/a1/profile", json={"display_name": ""})
+    r = client.get("/agents/a1")
+    assert r.get_json()["label"] == "Claude Code"
+
+
+def test_list_avatars(client):
+    r = client.get("/avatars")
+    assert r.status_code == 200
+    avatars = r.get_json()["avatars"]
+    assert len(avatars) > 0
+    assert "char_blue" in avatars
+
+
+def test_add_agent_with_profile(client):
+    """Can set display_name and avatar on creation."""
+    r = client.post("/agents", json={
+        "id": "a1", "name": "Claude Code",
+        "display_name": "Agent K", "avatar": "char_purple"
+    })
+    assert r.status_code == 201
+    data = r.get_json()
+    assert data["display_name"] == "Agent K"
+    assert data["avatar"] == "char_purple"
+    assert data["label"] == "Agent K"
+
+
 def test_full_workflow(client):
     """End-to-end: add -> set state -> check -> remove."""
     # Add
@@ -110,8 +173,8 @@ def test_full_workflow(client):
     client.post("/agents/claude/state", json={"state": "writing", "message": "重構"})
     client.post("/agents/gemini/state", json={"state": "researching", "message": "搜尋"})
 
-    # Index shows both
-    r = client.get("/")
+    # API status shows both
+    r = client.get("/api/status")
     data = r.get_json()
     assert data["agent_count"] == 2
     states = {a["id"]: a["state"] for a in data["agents"]}

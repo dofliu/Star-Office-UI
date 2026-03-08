@@ -6,14 +6,15 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from core.office import Office
-from core.agent import VALID_STATES
+from core.agent import VALID_STATES, DEFAULT_AVATARS
 
 PORT = int(os.environ.get("STAR_OFFICE_PORT", 19200))
 STORE_PATH = os.environ.get("STAR_OFFICE_STORE", "office-state.json")
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend-v2")
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=FRONTEND_DIR)
 
 
 def get_office():
@@ -54,12 +55,18 @@ def add_agent():
     name = data.get("name")
     ttl = data.get("ttl", 300)
 
+    display_name = data.get("display_name", "")
+    avatar = data.get("avatar", "")
+
     if not agent_id or not name:
         return jsonify({"error": "Missing 'id' and 'name'"}), 400
 
     office = get_office()
     try:
         agent = office.add_agent(agent_id, name, ttl)
+        if display_name or avatar:
+            office.update_profile(agent_id, display_name or None, avatar or None)
+            agent = office.get_agent(agent_id)
         return jsonify(agent.to_dict()), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 409
@@ -73,6 +80,30 @@ def remove_agent(agent_id):
         return jsonify({"removed": agent_id})
     except KeyError:
         return jsonify({"error": f"Agent '{agent_id}' not found"}), 404
+
+
+# --- Profile (display_name, avatar) ---
+
+@app.route("/agents/<agent_id>/profile", methods=["POST"])
+def update_profile(agent_id):
+    data = request.get_json(silent=True) or {}
+    display_name = data.get("display_name")
+    avatar = data.get("avatar")
+
+    if display_name is None and avatar is None:
+        return jsonify({"error": "Provide 'display_name' and/or 'avatar'"}), 400
+
+    office = get_office()
+    try:
+        agent = office.update_profile(agent_id, display_name, avatar)
+        return jsonify(agent.to_dict())
+    except KeyError:
+        return jsonify({"error": f"Agent '{agent_id}' not found"}), 404
+
+
+@app.route("/avatars", methods=["GET"])
+def list_avatars():
+    return jsonify({"avatars": DEFAULT_AVATARS})
 
 
 # --- State ---
@@ -96,10 +127,22 @@ def set_state(agent_id):
         return jsonify({"error": str(e)}), 400
 
 
-# --- Convenience: overview ---
+# --- Frontend ---
 
 @app.route("/")
 def index():
+    return send_from_directory(FRONTEND_DIR, "index.html")
+
+
+@app.route("/ui/<path:filename>")
+def serve_frontend(filename):
+    return send_from_directory(FRONTEND_DIR, filename)
+
+
+# --- API overview ---
+
+@app.route("/api/status")
+def api_status():
     office = get_office()
     agents = office.list_agents()
     return jsonify({
@@ -107,7 +150,8 @@ def index():
         "port": PORT,
         "agent_count": len(agents),
         "agents": [
-            {"id": a.id, "name": a.name, "state": a.state, "message": a.message}
+            {"id": a.id, "name": a.name, "label": a.label, "avatar": a.avatar,
+             "state": a.state, "message": a.message}
             for a in agents
         ],
         "valid_states": sorted(VALID_STATES),

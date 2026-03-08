@@ -7,15 +7,28 @@ WORK_STATES = {"writing", "researching", "executing", "syncing"}
 DEFAULT_TTL = 300  # seconds
 
 
+DEFAULT_AVATARS = [
+    "char_blue", "char_green", "char_red", "char_purple",
+    "char_orange", "char_cyan", "char_pink", "char_yellow",
+]
+
+
 class Agent:
     def __init__(self, agent_id: str, name: str, ttl: int = DEFAULT_TTL):
         self.id = agent_id
         self.name = name
+        self.display_name = ""   # custom nickname, falls back to name
+        self.avatar = ""         # avatar key or image path
         self.state = "idle"
         self.message = ""
         self.ttl = ttl
         self.last_updated = time.time()
         self.created_at = time.time()
+
+    @property
+    def label(self) -> str:
+        """Display name shown in UI — uses display_name if set, else name."""
+        return self.display_name or self.name
 
     def set_state(self, state: str, message: str = "") -> None:
         if state not in VALID_STATES:
@@ -40,6 +53,9 @@ class Agent:
         return {
             "id": self.id,
             "name": self.name,
+            "display_name": self.display_name,
+            "label": self.label,
+            "avatar": self.avatar,
             "state": self.state,
             "message": self.message,
             "ttl": self.ttl,
@@ -50,6 +66,8 @@ class Agent:
     @classmethod
     def from_dict(cls, data: dict) -> "Agent":
         agent = cls(data["id"], data["name"], data.get("ttl", DEFAULT_TTL))
+        agent.display_name = data.get("display_name", "")
+        agent.avatar = data.get("avatar", "")
         agent.state = data.get("state", "idle")
         agent.message = data.get("message", "")
         agent.last_updated = data.get("last_updated", time.time())
